@@ -5,13 +5,12 @@
     import Button from "$lib/Button.svelte";
     import {onMount} from "svelte";
     import OptionSelect from "$lib/OptionSelect.svelte";
-    import ExpandableFormInputs from "../../ExpandableFormInputs/ExpandableFormInputs.svelte";
+    import ExpandableInputs from "$lib/expandableInputs/ExpandableInputs.svelte";
     import {
-        REGEX_CLIENT_NAME, REGEX_DNS_SIMPLE, REGEX_LINUX_USER, SSH_CERT_AGLS, SSH_CERT_TYPES,
+        REGEX_CLIENT_NAME, REGEX_LINUX_USER, SSH_CERT_AGLS, SSH_CERT_TYPES,
     } from "../../../utils/constants.js";
     import {fetchPutClientSsh} from "../../../utils/dataFetching.js";
     import Input from "$lib/inputs/Input.svelte";
-    import ExpandableInputs from "$lib/expandableInputs/ExpandableInputs.svelte";
 
     export let client = {
         principals: ['nobody'],

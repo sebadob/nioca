@@ -4,7 +4,7 @@
     import * as yup from "yup";
     import {REGEX_JWT_CLAIM} from "../../../utils/constants.js";
     import {extractFormErrors} from "../../../utils/helpers.js";
-    import Switch from "../../Switch.svelte";
+    import Switch from "$lib/Switch.svelte";
     import Input from "$lib/inputs/Input.svelte";
     import OptionSelect from "$lib/OptionSelect.svelte";
     import Button from "$lib/Button.svelte";

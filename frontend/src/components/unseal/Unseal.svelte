@@ -10,9 +10,8 @@
         postUnsealAddKEy,
         postUnsealExecute
     } from "../../utils/dataFetchingUnseal.js";
-    import CheckIcon from "../../components/CheckIcon.svelte";
+    import CheckIcon from "$lib/CheckIcon.svelte";
     import * as yup from "yup";
-    import Loading from "$lib/Loading.svelte";
     import {fetchStatus} from "../../utils/dataFetching.js";
 
     let isLoading = false;

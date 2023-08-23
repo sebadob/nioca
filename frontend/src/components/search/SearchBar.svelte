@@ -1,7 +1,7 @@
 <script>
 	import IconMagnify from "../icons/IconMagnify.svelte";
 	import { onMount } from "svelte";
-	import Tooltip from "../Tooltip.svelte";
+    import Tooltip from "$lib/Tooltip.svelte";
 
 	export let items = [];
 	export let resItems;

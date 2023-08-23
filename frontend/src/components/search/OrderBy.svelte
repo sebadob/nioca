@@ -2,7 +2,7 @@
 	import { onMount } from "svelte";
 	import IconBarsArrowDown from "../icons/IconBarsArrowDown.svelte";
 	import IconBarsArrowUp from "../icons/IconBarsArrowUp.svelte";
-	import Tooltip from "../Tooltip.svelte";
+    import Tooltip from "$lib/Tooltip.svelte";
 
 	export let items = [];
 	export let resItems;

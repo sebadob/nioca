@@ -1,7 +1,7 @@
 <script>
-	import CheckIcon from "../CheckIcon.svelte";
+  import CheckIcon from "$lib/CheckIcon.svelte";
 	import IconLogout from "../icons/IconLogout.svelte";
-	import Tooltip from "../Tooltip.svelte";
+  import Tooltip from "$lib/Tooltip.svelte";
 	import { fetchLogout } from "../../utils/dataFetching.js";
 	import { deleteXsrfToken } from "../../utils/helpers.js";
 
