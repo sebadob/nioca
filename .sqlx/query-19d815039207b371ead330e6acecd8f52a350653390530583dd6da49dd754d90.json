@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select * from config where key = 'oidc'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "key",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "enc_key_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 2,
+        "name": "value",
+        "type_info": "Bytea"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "19d815039207b371ead330e6acecd8f52a350653390530583dd6da49dd754d90"
+}

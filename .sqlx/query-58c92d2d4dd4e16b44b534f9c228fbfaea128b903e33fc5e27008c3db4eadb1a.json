@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into config (key, enc_key_id, value) values('oidc', $1, $2)on conflict (key) do update set enc_key_id = $1, value = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Bytea"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "58c92d2d4dd4e16b44b534f9c228fbfaea128b903e33fc5e27008c3db4eadb1a"
+}

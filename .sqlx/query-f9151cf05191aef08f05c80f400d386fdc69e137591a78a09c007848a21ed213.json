@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE clients_ssh\n            SET name = $1, expires = $2, enabled = $3, key_alg = $4, group_id = $5, typ = $6, principals = $7,\n            force_command = $8, source_addresses = $9, permit_x11_forwarding = $10, permit_agent_forwarding = $11,\n            permit_port_forwarding = $12, permit_pty = $13, permit_user_rc = $14, valid_secs = $15\n            WHERE id = $16\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Timestamptz",
+        "Bool",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Int4",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f9151cf05191aef08f05c80f400d386fdc69e137591a78a09c007848a21ed213"
+}

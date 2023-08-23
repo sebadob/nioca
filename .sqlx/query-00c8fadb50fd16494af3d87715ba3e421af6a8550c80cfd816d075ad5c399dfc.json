@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update master_key set value = $1 where id = 'local_password'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "00c8fadb50fd16494af3d87715ba3e421af6a8550c80cfd816d075ad5c399dfc"
+}

@@ -1,0 +1,52 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM groups WHERE name = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "enabled",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "ca_ssh",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 4,
+        "name": "ca_x509",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 5,
+        "name": "ca_x509_typ",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "c4b313372a3cfcbdf972bd7323f725ce696c2c617610855b6373181981362ea1"
+}

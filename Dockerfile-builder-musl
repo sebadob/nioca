@@ -1,0 +1,17 @@
+FROM rust:1.71.1-alpine3.18
+
+RUN apk update && \
+    apk add --no-cache bash binaryen gcc git g++ libc-dev make npm openssl-dev protobuf-dev protoc
+
+RUN rustup component add clippy
+RUN cargo install just
+
+# leptos specifics
+#RUN rustup target add wasm32-unknown-unknown
+#RUN cargo install cargo-generate
+#RUN cargo install cargo-leptos
+#RUN npm install -g sass
+
+WORKDIR /work
+
+CMD /bin/bash

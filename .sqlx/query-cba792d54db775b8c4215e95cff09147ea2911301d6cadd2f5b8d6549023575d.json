@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "update certs_x509 set data = $1 where serial = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bytea",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cba792d54db775b8c4215e95cff09147ea2911301d6cadd2f5b8d6549023575d"
+}

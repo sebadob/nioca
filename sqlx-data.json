@@ -1,0 +1,1656 @@
+{
+  "db": "PostgreSQL",
+  "079332766b130519613cd31c62703c8f202ecba41563ead6f6ed96653ae10ba1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "email",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "token_set",
+          "ordinal": 3,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select * from users where email = $1"
+  },
+  "0972f054b06cb4a1b889b53894d032e528f35bc3f6d18b1effdd3be7ce6a2e86": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "expires",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 3,
+          "type_info": "Bool"
+        },
+        {
+          "name": "api_key",
+          "ordinal": 4,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "key_alg",
+          "ordinal": 6,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 7,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "typ",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "principals",
+          "ordinal": 9,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "force_command",
+          "ordinal": 10,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "source_addresses",
+          "ordinal": 11,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "permit_x11_forwarding",
+          "ordinal": 12,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_agent_forwarding",
+          "ordinal": 13,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_port_forwarding",
+          "ordinal": 14,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_pty",
+          "ordinal": 15,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_user_rc",
+          "ordinal": 16,
+          "type_info": "Bool"
+        },
+        {
+          "name": "valid_secs",
+          "ordinal": 17,
+          "type_info": "Int4"
+        },
+        {
+          "name": "latest_cert",
+          "ordinal": 18,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from clients_ssh"
+  },
+  "0a82b5d3790c9be87237959cf7ad0b5289fc9819218094230f8d5747250240a1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "cert_id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "pub_key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "group_name",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 4,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n            select c.id as cert_id, c.pub_key, c.group_id, g.name as group_name, g.enabled\n            from ca_certs_ssh c\n            join groups g on c.group_id = g.id\n            "
+  },
+  "19711b64b81433cfeef6e7197256f86727181661efd0bba5e7023270cbafbc7f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "cert_id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "pub_key",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 2,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "group_name",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 4,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            select c.id as cert_id, c.pub_key, c.group_id, g.name as group_name, g.enabled\n            from ca_certs_ssh c\n            join groups g on c.group_id = g.id\n            where c.id = $1\n            "
+  },
+  "19d815039207b371ead330e6acecd8f52a350653390530583dd6da49dd754d90": {
+    "describe": {
+      "columns": [
+        {
+          "name": "key",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "value",
+          "ordinal": 2,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from config where key = 'oidc'"
+  },
+  "225c49347df37027ecde4232b2124d5937b922ec8e4edfdee8aeb986abe3ad92": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "timestamp",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "direct_access",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "url",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from sealed"
+  },
+  "2586643174797ec26aa6ded053f4db80efbc04f0a3d46c48ed97a99aea877db4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "insert into ca_certs_x509 (id, data, enc_key_id) values ('nioca_key', $1, $2)"
+  },
+  "2c1ae47cd8d2c9427e42ec10d13bc6ec622054edb1fbe578c20ab493d5ab85a7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "alg",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "value",
+          "ordinal": 2,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from enc_keys where id = $1"
+  },
+  "34b38509964bba248b1c1a07a3716f18ff9c5b65088ce1a9405afb9462f80e9f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update ca_certs_ssh set data = $1, enc_key_id = $2 where id = $3"
+  },
+  "36f58c4fdf56cec5f263d11e299ecf6d6b403c02bed03ab3960bdf8767ccfa77": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "value",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from master_key where id = 'local_password'"
+  },
+  "4881e99f645a999406acb848e380f4ce3f90f13b1e7186c2d1ed38dc27ba4d90": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('check_master', $1)"
+  },
+  "48fa659ad218fc0d961a6e34a3e433bf09125402ee22e0f3f93424e14ac261b2": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "local",
+          "ordinal": 1,
+          "type_info": "Bool"
+        },
+        {
+          "name": "created",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "expires",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "xsrf",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "authenticated",
+          "ordinal": 5,
+          "type_info": "Bool"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "email",
+          "ordinal": 7,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "roles",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "groups",
+          "ordinal": 9,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "is_admin",
+          "ordinal": 10,
+          "type_info": "Bool"
+        },
+        {
+          "name": "is_user",
+          "ordinal": 11,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from sessions where id = $1"
+  },
+  "4a90222e9d4d2a2efbdd2a6322befec4fea46d223ccd660cb1b19969078cfd5b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "value",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from master_key"
+  },
+  "4ce08fcff1f46ed6e81b1688a2ca793efbe0ac7501a53e3badc1b928b8153175": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update ca_certs_x509 set fingerprint = $1, enc_key_id = $2 where id = 'nioca_cert'"
+  },
+  "52b4dad853163cd5376867abca7d6960680e431412dc6bce190c167bf5114dc4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Timestamptz",
+          "Varchar",
+          "Bytea",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "insert into ca_certs_x509 (id, expires, data, fingerprint, enc_key_id) values ('nioca_cert', $1, $2, $3, $4)"
+  },
+  "58c14079c0ed22507f6430083dc91ce437e9c30a5b5885b867c6e00f2bff4e3c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "delete from clients_x509 where id = $1"
+  },
+  "58c92d2d4dd4e16b44b534f9c228fbfaea128b903e33fc5e27008c3db4eadb1a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "insert into config (key, enc_key_id, value) values('oidc', $1, $2)on conflict (key) do update set enc_key_id = $1, value = $2"
+  },
+  "5a121ead27479c563a4cd90a1a530ae5a3abf74f589a37d7e3f286fe883dac85": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "delete from sessions where expires < $1"
+  },
+  "5a8185e8548c4ca6dcc752c373992bf89e221be927a4f0421251172ac91d87eb": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('enc_key_active', $1)"
+  },
+  "5bb05048f0cfcd85f0300ec9fa3963f6d0b5da3fb7e91885112aa72a923c547b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Timestamptz",
+          "Bool",
+          "Bytea",
+          "Uuid",
+          "Varchar",
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n            insert into clients_ssh (id, name, expires, enabled, api_key, enc_key_id, key_alg,\n            group_id, typ, principals, force_command, source_addresses, permit_x11_forwarding,\n            permit_agent_forwarding, permit_port_forwarding, permit_pty, permit_user_rc, valid_secs)\n            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)\n            "
+  },
+  "608ac93a7b0cb88439456a2477050c87605a9298f7a1c18093b2cbcaa67bb26c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "delete from clients_ssh where id = $1"
+  },
+  "65d7388cc09bd3ec9949131bb3ef83feb429567a730a840b5010f3370ee01b03": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('check_shard_2', $1)"
+  },
+  "6a4312e2459abb63468aacc5fdc1f7c0fd40e4fb617b9d62aab93fe7b4c9dd80": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Timestamptz",
+          "Varchar",
+          "Bytea",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "insert into ca_certs_x509 (id, expires, data, fingerprint, enc_key_id) values ('root_cert', $1, $2, $3, $4)"
+  },
+  "6b14b874eeb79dab7e7e8e90843a3d9cb907f3aadb7ad3d47508745d4d6e1028": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('check_shard_1', $1)"
+  },
+  "6e40b6d4169203259fc8da783e75784ab3ebfacae2058ba29847599c6317d87e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Uuid",
+          "Varchar",
+          "Bytea",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            insert into ca_certs_ssh (id, group_id, pub_key, data, enc_key_id)\n            values ($1, $2, $3, $4, $5)\n            "
+  },
+  "6f156a4d42fd2c60f4328600d0379bc8a0db7fb9b35497b65ca4b8143df67082": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update ca_certs_x509 set data = $1, enc_key_id = $2 where id = 'nioca_key'"
+  },
+  "7a01eb1634f116d7152933f83ce7de2a626d108d9c4270d22fff372a573a39bc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 2,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select * from groups where name = $1"
+  },
+  "7bce1f9e480938929e756b47ccda4b44ee5c125e8b7a8a3925f6e2f0f1835d54": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Timestamptz",
+          "Timestamptz",
+          "Uuid",
+          "Uuid",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "insert into certs (id, typ, created, expires, client, user_id, data) values ($1, $2, $3, $4, $5, $6, $7)"
+  },
+  "825a77b48b4b519dc07cb8d727cad2684e19a4b430be84402ce8cc4617b298f8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('local_password', $1)"
+  },
+  "8f45c9859fd32fc52531927bb64e0d341046b1672ccdbc9e295b3f0d5a3268d6": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "expires",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "data",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "fingerprint",
+          "ordinal": 3,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select * from ca_certs_x509 where id = $1"
+  },
+  "911dc0ccbb52180ef28f37c74e97ab44e41559589b03810641509a430ab1eb9c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Uuid",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "insert into users (id, email, enc_key_id, token_set) values ($1, $2, $3, $4)"
+  },
+  "924d6933961b4fb727f1d805dd47662d288bdc62c781226d43218a98d5cad4a9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "serial",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "typ",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created",
+          "ordinal": 3,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "expires",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "client",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "data",
+          "ordinal": 7,
+          "type_info": "Bytea"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from certs where id = $1"
+  },
+  "97aba86d8a42535bd4de79902f2776b1591f412874a7c94a4124bd5308b574bf": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "expires",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 3,
+          "type_info": "Bool"
+        },
+        {
+          "name": "api_key",
+          "ordinal": 4,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 5,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "key_alg",
+          "ordinal": 6,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 7,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "typ",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "principals",
+          "ordinal": 9,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "force_command",
+          "ordinal": 10,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "source_addresses",
+          "ordinal": 11,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "permit_x11_forwarding",
+          "ordinal": 12,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_agent_forwarding",
+          "ordinal": 13,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_port_forwarding",
+          "ordinal": 14,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_pty",
+          "ordinal": 15,
+          "type_info": "Bool"
+        },
+        {
+          "name": "permit_user_rc",
+          "ordinal": 16,
+          "type_info": "Bool"
+        },
+        {
+          "name": "valid_secs",
+          "ordinal": 17,
+          "type_info": "Int4"
+        },
+        {
+          "name": "latest_cert",
+          "ordinal": 18,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from clients_ssh where id = $1"
+  },
+  "a000e0c186e7acf6a7367db4d69da77e6acc356f4b00667bff359b54cf2a62e0": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Timestamptz",
+          "Bool",
+          "Varchar",
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Bool",
+          "Int4",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "\n            update clients_ssh set name = $1, expires = $2, enabled = $3, key_alg = $4, group_id = $5,\n            typ = $6, principals = $7, force_command = $8, source_addresses = $9,\n            permit_x11_forwarding = $10, permit_agent_forwarding = $11, permit_port_forwarding = $12,\n            permit_pty = $13, permit_user_rc = $14, valid_secs = $15 where id = $16\n            "
+  },
+  "a51ee935f7a639589cbd78abceb0b3dbfdfb656d69832b86cc4e1a13b0e77ef9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "pub_key",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "data",
+          "ordinal": 3,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from ca_certs_ssh where group_id = $1"
+  },
+  "a8eef12fac61925312c2e06de0880678c6ecde95058735faecdb00f656f6015b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update clients_ssh set latest_cert = $1 where id = $2"
+  },
+  "acaef5437e416f3fa9f826ccee043f6581af03a68f330bbe027e7925f666821a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update clients_x509 set api_key = $1, enc_key_id = $2 where id = $3"
+  },
+  "ae7a74348d8093d3e712989d522ce621842859ee5e2abe6d23c1cd6a583cae67": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "delete from sealed where id = $1"
+  },
+  "b46c6b147f84297f9c5e462a888b5c3b80df2d101889071c0e3fad3b7f90b8b9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update ca_certs_x509 set fingerprint = $1, enc_key_id = $2 where id = 'root_cert'"
+  },
+  "bb1d273c718e24d75ef83db9fbb8a9079372a79717ab16dd2a57566419a3211e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 2,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from groups where id = $1"
+  },
+  "c40daa42d2485f32eb293a28172e4a759a01c3fc4b02f7acb89217d1d7ff8144": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "expires",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 3,
+          "type_info": "Bool"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "api_key",
+          "ordinal": 5,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "key_alg",
+          "ordinal": 7,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "common_name",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "country",
+          "ordinal": 9,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "locality",
+          "ordinal": 10,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "organizational_unit",
+          "ordinal": 11,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "organization",
+          "ordinal": 12,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "state_or_province",
+          "ordinal": 13,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "alt_names_dns",
+          "ordinal": 14,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "alt_names_ip",
+          "ordinal": 15,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "key_usage",
+          "ordinal": 16,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "key_usage_ext",
+          "ordinal": 17,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "valid_hours",
+          "ordinal": 18,
+          "type_info": "Int4"
+        },
+        {
+          "name": "email",
+          "ordinal": 19,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "latest_cert",
+          "ordinal": 20,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "select * from clients_x509"
+  },
+  "c65df51ab28fe56fbb3c58124cfe8835eff3553d933005933a5af4e0e25d6f47": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Timestamptz",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update sessions set expires = $1, authenticated = true where id = $2"
+  },
+  "df75d21861572ea215e23684d1f0138cc7aed05603fd2d4ae2bc050103feeaca": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Timestamptz",
+          "Bool",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into sealed (id, timestamp, direct_access, url) values ($1, $2, $3, $4)"
+  },
+  "dfda4c931838a6c6461d20fffb8d4bf917cb98f711b895632d0bd6e6a3aa13e9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Bool",
+          "Timestamptz",
+          "Timestamptz",
+          "Varchar",
+          "Bool",
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bool",
+          "Bool"
+        ]
+      }
+    },
+    "query": "insert into sessions (id, local, created, expires, xsrf, authenticated, user_id, email, roles, groups, is_admin, is_user) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"
+  },
+  "dff2f2c77df10db4f1274d79a351f4928e0ac76aa51ba227d99f8ab3a7a0a50d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "name",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "expires",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "enabled",
+          "ordinal": 3,
+          "type_info": "Bool"
+        },
+        {
+          "name": "group_id",
+          "ordinal": 4,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "api_key",
+          "ordinal": 5,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "enc_key_id",
+          "ordinal": 6,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "key_alg",
+          "ordinal": 7,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "common_name",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "country",
+          "ordinal": 9,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "locality",
+          "ordinal": 10,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "organizational_unit",
+          "ordinal": 11,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "organization",
+          "ordinal": 12,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "state_or_province",
+          "ordinal": 13,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "alt_names_dns",
+          "ordinal": 14,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "alt_names_ip",
+          "ordinal": 15,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "key_usage",
+          "ordinal": 16,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "key_usage_ext",
+          "ordinal": 17,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "valid_hours",
+          "ordinal": 18,
+          "type_info": "Int4"
+        },
+        {
+          "name": "email",
+          "ordinal": 19,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "latest_cert",
+          "ordinal": 20,
+          "type_info": "Int4"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "select * from clients_x509 where id = $1"
+  },
+  "e10c7bec56934fd89580afcc9684293359878b4060ebf6add0b3f7443d1766ca": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Int4"
+        ]
+      }
+    },
+    "query": "update certs set data = $1 where serial = $2"
+  },
+  "e55f8b7daf80dcd14d91196598105dab101dd474ee8f9a48562cc3a5e8fdfb77": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into master_key (id, value) values ('initialized', $1)"
+  },
+  "e9e1a53666b8923c435b51723d789a3e01474e6c51c7fce74081c7b8ff0125a6": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update clients_x509 set latest_cert = $1 where id = $2"
+  },
+  "eba11e0701616a14d38a18a7ca9b4faf67f91b3844663edae79dd7609135b19d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Timestamptz",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update sessions set expires = $1 where id = $2"
+  },
+  "f1245e94dda87c4766c649ffc467d38476764549e20d84aad78828a739d0f695": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "delete from sealed where direct_access = true and url = $1"
+  },
+  "fa3479a6ea9a2fbc30ab9c3c6e26d9034756189ab54f35debaf91ad5e5ab4e7d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Timestamptz",
+          "Bytea",
+          "Bool",
+          "Uuid",
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bytea",
+          "Bytea",
+          "Int4",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "insert into clients_x509 (id, name, expires, api_key, enabled, group_id, enc_key_id, key_alg, common_name, country, locality, organizational_unit, organization, state_or_province, alt_names_dns, alt_names_ip, key_usage, key_usage_ext, valid_hours, email) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)"
+  },
+  "fbfe90a6755893c9b9a2ad851bad0afd8ed8a3e52cb383003621ab68b330b73a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Uuid",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update clients_ssh set api_key = $1, enc_key_id = $2 where id = $3"
+  },
+  "fce5f1cd431571054276d99ce541a1aa38a487b599a50854122b1d519430e6ce": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Varchar",
+          "Bytea"
+        ]
+      }
+    },
+    "query": "insert into enc_keys (id, alg, value) values ($1, $2, $3)"
+  },
+  "ffbf03ea3e3c2906b2e21aa9f60bd198ccaf218f7c0fa2c13e716f120d5dbf9a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Timestamptz",
+          "Bool",
+          "Uuid",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Bytea",
+          "Bytea",
+          "Int4",
+          "Varchar",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "update clients_x509 set name = $1, expires = $2, enabled = $3, group_id = $4, key_alg = $5, common_name = $6, country = $7, locality = $8, organizational_unit = $9, organization = $10, state_or_province = $11, alt_names_dns = $12, alt_names_ip = $13, key_usage = $14, key_usage_ext = $15, valid_hours = $16, email = $17 where id = $18"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO clients_x509 (id, name, expires, api_key, enabled, group_id, enc_key_id, key_alg,\n            common_name, country, locality, organizational_unit, organization, state_or_province,\n            alt_names_dns, alt_names_ip, key_usage, key_usage_ext, valid_hours, email)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Timestamptz",
+        "Bytea",
+        "Bool",
+        "Uuid",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bytea",
+        "Bytea",
+        "Int4",
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "45ad62154b6f5143c5cd994c9207d4ddcb0f5057d29cf9e5f9d91f8038ac90be"
+}

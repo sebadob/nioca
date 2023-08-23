@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE groups SET name = $1, enabled = $2, ca_ssh = $3, ca_x509 = $4 WHERE id = $5",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Bool",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8ed93b3dbf5584d6ba827417a3a5f24a022ec0f441e45301c382819be134a3cb"
+}

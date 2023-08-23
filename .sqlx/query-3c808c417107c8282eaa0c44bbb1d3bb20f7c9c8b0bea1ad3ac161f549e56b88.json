@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO clients_ssh (id, name, expires, enabled, api_key, enc_key_id, key_alg,\n            group_id, typ, principals, force_command, source_addresses, permit_x11_forwarding,\n            permit_agent_forwarding, permit_port_forwarding, permit_pty, permit_user_rc, valid_secs)\n            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Timestamptz",
+        "Bool",
+        "Bytea",
+        "Uuid",
+        "Varchar",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Bool",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3c808c417107c8282eaa0c44bbb1d3bb20f7c9c8b0bea1ad3ac161f549e56b88"
+}

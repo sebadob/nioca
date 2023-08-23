@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select * from master_key",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "value",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "4a90222e9d4d2a2efbdd2a6322befec4fea46d223ccd660cb1b19969078cfd5b"
+}

@@ -1,0 +1,286 @@
+use crate::certificates::encryption::decrypt_by_kid;
+use crate::config::{Db, EncKeys};
+use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
+use crate::util::{fingerprint, pem_to_der};
+use der::Document;
+use sqlx::{query, query_as};
+use time::OffsetDateTime;
+use tracing::{error, info};
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Default)]
+pub struct CaCertX509Entity {
+    pub id: Uuid,
+    pub typ: CaCertX509Type,
+    pub name: String,
+    pub expires: Option<OffsetDateTime>,
+    pub data: String,
+    pub fingerprint: Option<Vec<u8>>,
+    pub enc_key_id: Uuid,
+}
+
+impl CaCertX509Entity {
+    pub async fn find_all_by_type(typ: CaCertX509Type) -> Result<Vec<Self>, ErrorResponse> {
+        let res = query_as!(
+            Self,
+            "SELECT * FROM ca_certs_x509 WHERE typ = $1",
+            typ.as_str()
+        )
+        .fetch_all(Db::conn())
+        .await?;
+        Ok(res)
+    }
+
+    pub async fn find_default(typ: CaCertX509Type) -> Result<Self, ErrorResponse> {
+        query_as!(
+            Self,
+            r#"SELECT * FROM ca_certs_x509
+            WHERE typ = $1
+            AND id = (SELECT uuid(value) FROM master_key WHERE id = 'default_x509')"#,
+            typ.as_str(),
+        )
+        .fetch_one(Db::conn())
+        .await
+        .map_err(ErrorResponse::from)
+    }
+
+    #[allow(dead_code)]
+    pub async fn find_by_id(id: &Uuid, typ: CaCertX509Type) -> Result<Self, ErrorResponse> {
+        query_as!(
+            Self,
+            "SELECT * FROM ca_certs_x509 WHERE id = $1 AND typ = $2",
+            id,
+            typ.as_str(),
+        )
+        .fetch_one(Db::conn())
+        .await
+        .map_err(ErrorResponse::from)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, sqlx::Type)]
+#[sqlx(type_name = "typ")]
+#[sqlx(rename_all = "lowercase")]
+pub enum CaCertX509Type {
+    Unknown,
+    Root,
+    Certificate,
+    Key,
+}
+
+impl Default for CaCertX509Type {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}
+
+impl From<String> for CaCertX509Type {
+    fn from(value: String) -> Self {
+        Self::from(value.as_str())
+    }
+}
+
+impl From<&str> for CaCertX509Type {
+    fn from(value: &str) -> Self {
+        match value {
+            "root" => Self::Root,
+            "certificate" => Self::Certificate,
+            "key" => Self::Key,
+            "unknown" => Self::Unknown,
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl CaCertX509Type {
+    pub fn as_str<'a>(&self) -> &'a str {
+        match self {
+            CaCertX509Type::Root => "root",
+            CaCertX509Type::Certificate => "certificate",
+            CaCertX509Type::Key => "key",
+            CaCertX509Type::Unknown => "unknown",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CaCertX509Root {
+    pub expires: OffsetDateTime,
+    pub cert_pem: String,
+    pub cert_der: Document,
+    pub fingerprint: String,
+}
+
+impl CaCertX509Root {
+    pub async fn find_default(
+        enc_keys: &EncKeys,
+        is_sealed: bool,
+    ) -> Result<CaCertX509Root, ErrorResponse> {
+        let cert_entity = CaCertX509Entity::find_default(CaCertX509Type::Root).await?;
+        Self::build(cert_entity, enc_keys, is_sealed).await
+    }
+
+    #[allow(dead_code)]
+    pub async fn find(
+        id: &Uuid,
+        enc_keys: &EncKeys,
+        is_sealed: bool,
+    ) -> Result<CaCertX509Root, ErrorResponse> {
+        let cert_entity = CaCertX509Entity::find_by_id(id, CaCertX509Type::Root).await?;
+        Self::build(cert_entity, enc_keys, is_sealed).await
+    }
+
+    pub async fn build(
+        cert: CaCertX509Entity,
+        enc_keys: &EncKeys,
+        is_sealed: bool,
+    ) -> Result<CaCertX509Root, ErrorResponse> {
+        let fingerprint_str = if is_sealed {
+            String::default()
+        } else {
+            let (bytes, bytes_new) =
+                decrypt_by_kid(&cert.fingerprint.unwrap(), &cert.enc_key_id, enc_keys).await?;
+            if let Some(bytes_new) = bytes_new {
+                query!(
+                    "UPDATE ca_certs_x509 SET fingerprint = $1, enc_key_id = $2 WHERE id = $3 AND typ = $4",
+                    bytes_new,
+                    enc_keys.enc_key.id,
+                    cert.id,
+                    CaCertX509Type::Root.as_str(),
+                )
+                    .execute(Db::conn())
+                .await?;
+            }
+            let fingerprint_str = String::from_utf8(bytes)?;
+            info!("Root PEM fingerprint: {}", fingerprint_str);
+
+            // validate the fingerprint
+            let finger = fingerprint(cert.data.as_bytes());
+            // let finger = fingerprint(cert.data.as_bytes());
+            if fingerprint_str == finger {
+                info!("Fingerprint for Root PEM matches");
+            } else {
+                info!("\n\ncert.data:\n{}\n\n", cert.data);
+                panic!(
+                    "Fingerprint mismatch for CaCertRoot: {} != {}",
+                    fingerprint_str, finger
+                );
+            }
+
+            fingerprint_str
+        };
+
+        let cert_der = pem_to_der(&cert.data)?;
+
+        Ok(CaCertX509Root {
+            expires: cert.expires.unwrap(),
+            cert_pem: cert.data,
+            cert_der,
+            fingerprint: fingerprint_str,
+        })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CaCertX509Nioca {
+    pub id: Uuid,
+    pub expires: OffsetDateTime,
+    pub cert_pem: String,
+    pub cert_der: Document,
+    pub key: String,
+    pub fingerprint: String,
+}
+
+impl CaCertX509Nioca {
+    pub async fn find_default(enc_keys: &EncKeys) -> Result<CaCertX509Nioca, ErrorResponse> {
+        let cert_entity = CaCertX509Entity::find_default(CaCertX509Type::Certificate).await?;
+        let key_entity = CaCertX509Entity::find_default(CaCertX509Type::Key).await?;
+        Self::build(cert_entity, key_entity, enc_keys).await
+    }
+
+    #[allow(dead_code)]
+    pub async fn find(id: &Uuid, enc_keys: &EncKeys) -> Result<CaCertX509Nioca, ErrorResponse> {
+        let cert_entity = CaCertX509Entity::find_by_id(id, CaCertX509Type::Certificate).await?;
+        let key_entity = CaCertX509Entity::find_by_id(id, CaCertX509Type::Key).await?;
+        Self::build(cert_entity, key_entity, enc_keys).await
+    }
+
+    async fn build(
+        cert_entity: CaCertX509Entity,
+        key_entity: CaCertX509Entity,
+        enc_keys: &EncKeys,
+    ) -> Result<CaCertX509Nioca, ErrorResponse> {
+        // private key
+        let key_decoded = hex::decode(key_entity.data).expect("Decoding Cert Key from HEX");
+        let (key_bytes, key_bytes_new) =
+            decrypt_by_kid(&key_decoded, &cert_entity.enc_key_id, enc_keys).await?;
+        let key = match String::from_utf8(key_bytes) {
+            Ok(k) => k,
+            Err(err) => {
+                error!("{}", err);
+                return Err(ErrorResponse::new(
+                    ErrorResponseType::Internal,
+                    "Error reconstructing the private key".to_string(),
+                ));
+            }
+        };
+
+        let db = Db::conn();
+        if let Some(bytes_new) = key_bytes_new {
+            let nioca_key_enc_hex = hex::encode(bytes_new);
+            query!(
+                "UPDATE ca_certs_x509 SET data = $1, enc_key_id = $2 WHERE id = $3 AND typ = $4",
+                nioca_key_enc_hex,
+                enc_keys.enc_key.id,
+                key_entity.id,
+                CaCertX509Type::Key.as_str(),
+            )
+            .execute(db)
+            .await?;
+        }
+
+        // fingerprint
+        let (fingerprint_bytes, fingerprint_bytes_new) = decrypt_by_kid(
+            &cert_entity.fingerprint.unwrap(),
+            &cert_entity.enc_key_id,
+            enc_keys,
+        )
+        .await?;
+        if let Some(bytes_new) = fingerprint_bytes_new {
+            query!(
+                "UPDATE ca_certs_x509 SET fingerprint = $1, enc_key_id = $2 WHERE id = $3 AND typ = $4",
+                bytes_new,
+                enc_keys.enc_key.id,
+                cert_entity.id,
+                CaCertX509Type::Certificate.as_str(),
+            )
+                .execute(db)
+                .await?;
+        }
+        let fingerprint_str = String::from_utf8(fingerprint_bytes)?;
+        info!("Nioca Intermediate PEM fingerprint: {}", fingerprint_str);
+
+        // validate the fingerprint
+        let finger = fingerprint(cert_entity.data.as_bytes());
+        if fingerprint_str == finger {
+            info!("Fingerprint for Nioca Intermediate PEM matches");
+        } else {
+            info!("\n\ncert_entity.data:\n{}\n\n", cert_entity.data);
+            panic!(
+                "Fingerprint mismatch for CaCertNioca: {} != {}",
+                fingerprint_str, finger
+            );
+        }
+
+        let cert_der = pem_to_der(&cert_entity.data)?;
+
+        Ok(CaCertX509Nioca {
+            id: cert_entity.id,
+            expires: cert_entity.expires.unwrap(),
+            cert_pem: cert_entity.data,
+            cert_der,
+            key,
+            fingerprint: fingerprint_str,
+        })
+    }
+}

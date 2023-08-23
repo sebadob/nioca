@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "insert into ca_certs_x509 (id, typ, name, expires, data, fingerprint, enc_key_id) values ($1, $2, 'default', $3, $4, $5, $6)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Timestamptz",
+        "Varchar",
+        "Bytea",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2dec0475b9f8c499551d47138e68ac0969e9e846f5c8187f017c984131ae68fe"
+}

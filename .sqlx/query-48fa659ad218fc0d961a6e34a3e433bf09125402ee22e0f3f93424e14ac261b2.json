@@ -1,0 +1,88 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "select * from sessions where id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "local",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "xsrf",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "authenticated",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "user_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 7,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "roles",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "groups",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 10,
+        "name": "is_admin",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 11,
+        "name": "is_user",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "48fa659ad218fc0d961a6e34a3e433bf09125402ee22e0f3f93424e14ac261b2"
+}
