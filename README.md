@@ -67,7 +67,7 @@ However, the very first database and user must exist. Create them on any postgre
 the following:
 
 ```sql
-CREATE USER nioca WITH PASSWORD '123SuperNioca';
+CREATE USER nioca WITH PASSWORD '123SuperSafe';
 CREATE DATABASE nioca WITH OWNER nioca;
 ```
 
