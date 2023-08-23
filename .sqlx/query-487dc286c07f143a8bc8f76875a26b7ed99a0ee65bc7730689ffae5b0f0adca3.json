@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE clients_x509\n            SET name = $1, expires = $2, enabled = $3, group_id = $4, key_alg = $5, common_name = $6, country = $7,\n            locality = $8, organizational_unit = $9, organization = $10, state_or_province = $11, alt_names_dns = $12,\n            alt_names_ip = $13, key_usage = $14, key_usage_ext = $15, valid_hours = $16, email = $17\n            WHERE id = $18",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Timestamptz",
+        "Bool",
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Bytea",
+        "Bytea",
+        "Int4",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "487dc286c07f143a8bc8f76875a26b7ed99a0ee65bc7730689ffae5b0f0adca3"
+}

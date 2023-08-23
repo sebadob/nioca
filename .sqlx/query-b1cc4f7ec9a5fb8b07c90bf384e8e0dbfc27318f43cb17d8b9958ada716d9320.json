@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE groups SET ca_x509 = $1 WHERE name = 'default'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b1cc4f7ec9a5fb8b07c90bf384e8e0dbfc27318f43cb17d8b9958ada716d9320"
+}

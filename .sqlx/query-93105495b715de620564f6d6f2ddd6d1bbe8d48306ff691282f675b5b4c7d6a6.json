@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO master_key (id, value) VALUES ('local_password', $1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "93105495b715de620564f6d6f2ddd6d1bbe8d48306ff691282f675b5b4c7d6a6"
+}

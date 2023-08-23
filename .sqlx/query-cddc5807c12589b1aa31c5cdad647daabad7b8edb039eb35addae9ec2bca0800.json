@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO master_key (id, value) VALUES ('check_shard_2', $1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cddc5807c12589b1aa31c5cdad647daabad7b8edb039eb35addae9ec2bca0800"
+}

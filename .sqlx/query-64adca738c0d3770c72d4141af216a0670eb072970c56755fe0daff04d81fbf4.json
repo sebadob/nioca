@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO master_key (id, value) VALUES ('initialized', $1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "64adca738c0d3770c72d4141af216a0670eb072970c56755fe0daff04d81fbf4"
+}

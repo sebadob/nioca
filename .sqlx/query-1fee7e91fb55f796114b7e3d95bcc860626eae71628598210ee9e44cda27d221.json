@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE ca_certs_x509 SET fingerprint = $1, enc_key_id = $2 WHERE id = $3 AND typ = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Bytea",
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1fee7e91fb55f796114b7e3d95bcc860626eae71628598210ee9e44cda27d221"
+}

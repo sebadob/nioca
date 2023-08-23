@@ -17,6 +17,11 @@ migrate:
     DATABASE_URL={{db_url}} sqlx migrate run
 
 
+# runs `cargo sqlx prepare` against the correct database
+prepare:
+    DATABASE_URL={{db_url}} cargo sqlx prepare
+
+
 # run `cargo clippy` with correct env vars
 clippy:
     #!/usr/bin/env bash
@@ -112,7 +117,7 @@ build: build-ui
     #!/usr/bin/env bash
     set -euxo pipefail
 
-    cargo clippy -- -D warnings
+    DATABASE_URL={{db_url}} cargo clippy -- -D warnings
 
     # manually update the cross image: docker pull ghcr.io/cross-rs/x86_64-unknown-linux-musl:main
     which cross || echo "'cross' needs to be installed: cargo install cross --git https://github.com/cross-rs/cross"
@@ -151,12 +156,10 @@ is-clean: test build
 #    git push origin "v$TAG"
 
 
-## publishes the application images
-#publish:
-#    docker build --no-cache -t sdobedev/rauthy:$TAG .
-#    docker push sdobedev/rauthy:$TAG
-#    docker build --no-cache -f Dockerfile.debug -t sdobedev/rauthy:$TAG-debug .
-#    docker push sdobedev/rauthy:$TAG-debug
-#
-#    docker tag sdobedev/rauthy:$TAG sdobedev/rauthy:latest
-#    docker push sdobedev/rauthy:latest
+# publishes the application images
+publish: build-image
+    docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
+    #docker push sdobedev/nioca:$TAG
+
+    docker tag sdobedev/nioca:$TAG sdobedev/nioca:latest
+    docker push sdobedev/nioca:latest

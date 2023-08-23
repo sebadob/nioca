@@ -109,13 +109,13 @@ CREATE DATABASE nioca WITH OWNER nioca;
 - If you have a Postgres running on your localhost:
 
 ```
-docker run --rm -v ./.env.deploy:/.env --network="host" sdobedev/nioca:0.4.0
+docker run --rm -v ./.env.deploy:/.env --network="host" sdobedev/nioca
 ```
 
 - If you have it inside the same docker network, for instance with docker compose:
 
 ```
-docker run --rm -v ./.env.deploy:/.env -p 8080:8080 -p 8443:8443 sdobedev/nioca:0.4.0
+docker run --rm -v ./.env.deploy:/.env -p 8080:8080 -p 8443:8443 sdobedev/nioca
 ```
 
 **Note:** Currently, this step is a bit tricky. To have a "secure" TLS connection in the browser, we MUST use port 443.

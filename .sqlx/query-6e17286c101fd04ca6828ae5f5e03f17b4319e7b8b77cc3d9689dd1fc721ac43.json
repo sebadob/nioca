@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ca_certs_x509 (id, typ, name, data, enc_key_id) VALUES ($1, $2, 'default', $3, $4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Varchar",
+        "Varchar",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6e17286c101fd04ca6828ae5f5e03f17b4319e7b8b77cc3d9689dd1fc721ac43"
+}
