@@ -7,6 +7,7 @@ use std::net::IpAddr;
 #[derive(Debug, PartialEq, Parser)]
 #[command(author, version)]
 pub enum Cli {
+    /// Starts the server
     Server,
     Ssh(Box<SshOptions>),
     X509(Box<X509CliOptions>),
@@ -170,7 +171,6 @@ pub struct SshOptions {
     pub principal: Vec<String>,
 
     /// Each bootstrap stage can be executed individually to have different subjects.
-    /// If 'full' is chosen, the given arguments for the subject will be used in all certificates.
     #[clap(short = 's', long = "stage", value_enum)]
     pub stage: SshStage,
 
