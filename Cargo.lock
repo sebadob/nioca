@@ -192,7 +192,7 @@ dependencies = [
  "num-traits",
  "rusticata-macros",
  "thiserror",
-    "time 0.3.28",
+    "time",
 ]
 
 [[package]]
@@ -596,11 +596,8 @@ checksum = "ec837a71355b28f6556dbd569b37b3f363091c0bd4b2e735674521b4c5fd9bc5"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
- "js-sys",
  "num-traits",
  "serde",
- "time 0.1.45",
- "wasm-bindgen",
  "winapi",
 ]
 
@@ -675,7 +672,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7efb37c3e1ccb1ff97164ad95ac1606e8ccd35b3fa0a7d99a304c7f4a428cc24"
 dependencies = [
  "percent-encoding",
-    "time 0.3.28",
+    "time",
  "version_check",
 ]
 
@@ -931,12 +928,6 @@ dependencies = [
  "quote",
  "syn 2.0.29",
 ]
-
-[[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
 name = "dotenvy"
@@ -1255,7 +1246,7 @@ dependencies = [
  "cfg-if",
  "js-sys",
  "libc",
- "wasi 0.11.0+wasi-snapshot-preview1",
+    "wasi",
  "wasm-bindgen",
 ]
 
@@ -1746,7 +1737,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "927a765cd3fc26206e66b296465fa9d3e5ab003e651c1b3c060e7956d96b19d2"
 dependencies = [
  "libc",
- "wasi 0.11.0+wasi-snapshot-preview1",
+    "wasi",
  "windows-sys",
 ]
 
@@ -1778,7 +1769,7 @@ dependencies = [
  "clap",
  "cron",
     "der",
- "dotenv",
+    "dotenvy",
     "ecdsa",
     "ed25519",
  "ed25519-dalek",
@@ -1806,7 +1797,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "ssh-key",
-    "time 0.3.28",
+    "time",
  "tokio",
  "tokio-test",
  "tokio-util",
@@ -2253,7 +2244,7 @@ checksum = "4954fbc00dcd4d8282c987710e50ba513d351400dbdd00e803a05172a90d8976"
 dependencies = [
  "pem 2.0.1",
  "ring",
-    "time 0.3.28",
+    "time",
  "x509-parser",
  "yasna",
  "zeroize",
@@ -2835,7 +2826,7 @@ dependencies = [
  "smallvec",
  "sqlformat",
  "thiserror",
-    "time 0.3.28",
+    "time",
  "tokio",
  "tokio-stream",
  "tracing",
@@ -2921,7 +2912,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
-    "time 0.3.28",
+    "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2962,7 +2953,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
-    "time 0.3.28",
+    "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2986,7 +2977,7 @@ dependencies = [
  "percent-encoding",
  "serde",
  "sqlx-core",
-    "time 0.3.28",
+    "time",
  "tracing",
  "url",
  "uuid",
@@ -3137,17 +3128,6 @@ checksum = "3fdd6f064ccff2d6567adcb3873ca630700f00b5ad3f060c25b5dcfd9a4ce152"
 dependencies = [
  "cfg-if",
  "once_cell",
-]
-
-[[package]]
-name = "time"
-version = "0.1.45"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b797afad3f312d1c66a56d11d0316f916356d11bd158fbc6ca6389ff6bf805a"
-dependencies = [
- "libc",
- "wasi 0.10.0+wasi-snapshot-preview1",
- "winapi",
 ]
 
 [[package]]
@@ -3627,12 +3607,6 @@ dependencies = [
 
 [[package]]
 name = "wasi"
-version = "0.10.0+wasi-snapshot-preview1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
-
-[[package]]
-name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
@@ -3865,7 +3839,7 @@ dependencies = [
  "ring",
  "rusticata-macros",
  "thiserror",
-    "time 0.3.28",
+    "time",
 ]
 
 [[package]]
@@ -3880,7 +3854,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e17bb3549cc1321ae1296b9cdc2698e2b6cb1992adfa19a8c72e5b7a738f44cd"
 dependencies = [
-    "time 0.3.28",
+    "time",
 ]
 
 [[package]]

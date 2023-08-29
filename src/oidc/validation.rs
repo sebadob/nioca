@@ -377,7 +377,7 @@ mod tests {
     use tracing::info;
 
     fn tracing() {
-        dotenv::dotenv().ok();
+        dotenvy::dotenv().ok();
         let subscriber = tracing_subscriber::FmtSubscriber::builder()
             .with_max_level(tracing::Level::INFO)
             .finish();
