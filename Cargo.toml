@@ -22,11 +22,11 @@ base64 = "0.21"
 bincode = "1.3"
 cached = { version = "0.44.0", features = ["async_tokio_rt_multi_thread"] }
 chacha20poly1305 = { version = "0.10", features = ["std"] }
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4", default-features = false, features = ["serde"] }
 clap = { version = "4.1", features = ["derive"] }
 cron = "0.12"
 der = { version = "0.7", features = ["std", "pem"] }
-dotenv = "0.15"
+dotenvy = "0.15"
 ecdsa = { version = "0.16", features = ["der", "pkcs8", "std", "pem", "signing"] }
 ed25519 = { version = "2.1", features = ["pem", "pkcs8", "zeroize"] }
 ed25519-dalek = { version = "2", features = ["pem", "pkcs8", "rand_core"] }

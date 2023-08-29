@@ -241,8 +241,12 @@ impl ClientSshEntity {
         let valid_after = now - 120;
         let valid_before = now + self.valid_secs as u64;
 
-        let mut cert_builder =
-            Builder::new_with_random_nonce(&mut OsRng, key.public_key(), valid_after, valid_before);
+        let mut cert_builder = Builder::new_with_random_nonce(
+            &mut OsRng,
+            key.public_key(),
+            valid_after,
+            valid_before,
+        )?;
 
         let key_id = format!("nioca-{}", group.name);
         cert_builder.key_id(key_id)?;

@@ -21,7 +21,7 @@ pub async fn build_user(opt: &SshOptions, ca_key: &PrivateKey) -> Result<(), Err
     let valid_before = now + (60 * opt.valid);
 
     let mut cert_builder =
-        Builder::new_with_random_nonce(&mut OsRng, key.public_key(), valid_after, valid_before);
+        Builder::new_with_random_nonce(&mut OsRng, key.public_key(), valid_after, valid_before)?;
 
     let next_serial = get_serial(opt, OUT_DIR_USER).await?;
     cert_builder.serial(next_serial)?;

@@ -5,7 +5,7 @@ pub fn setup_logging() -> tracing::Level {
     use tracing::Level;
 
     // setup logging
-    dotenv::dotenv().ok();
+    dotenvy::dotenv().ok();
     let log_level = match env::var("LOG_LEVEL")
         .unwrap_or_else(|_| String::from("info"))
         .trim()
