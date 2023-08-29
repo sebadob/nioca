@@ -157,6 +157,12 @@ is-clean: test build
 
 
 # publishes the application images
+publish-nightly: build-image
+    docker build --no-cache -f Dockerfile -t sdobedev/nioca:nightly .
+    docker push sdobedev/nioca:nightly
+
+
+# publishes the application images
 publish: build-image
     docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
     #docker push sdobedev/nioca:$TAG
