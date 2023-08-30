@@ -153,6 +153,87 @@ come in the future which makes it possible to run the container with a non-root 
 10. After your first login, you can (and should) create an SSH CA from the navigation.
 11. More in-depth readme and tutorials will follow in the future.
 
+## Running behind an Ingress proxy
+
+You can run Nioca behind an ingress (Traefik in this example) as well. A reason could be because you just do not have multiple
+different IP addresses or no LoadBalancer in front for smaller setups.
+
+There is currently no way (apart from using `DEV_MODE`) to start a plain HTTP server.
+You should never(!) have any unencrypted connection to Nioca, since it has one of the most critical roles in your infrastructure!
+The only situation in which you could actually start a plain HTTP server is, when you are running it behind an ingress and
+you are using a service mesh that actually warps every single connection inside mTLS anyway already.
+For this special use case, there will be an option in the future to actually start a plain HTTP server.
+For now, you will need to add the Root Certificate to Traefik if you are running Nioca behind it. You will get an
+Internal Server Error from Traefik, if you do not do this.
+
+This is a very short gist to provide a starting point.
+- set `PORT_HTTPS=8443` and `PORT_HTTPS_PUB=443` in Niocas config and restart
+- create a secret inside the `traefik` namespace or whereever your instance is running:
+```yaml
+k3s kubectl -n traefik create secret generic root.cert.pem --from-file=root.cert.pem
+```
+- add a startup arg to traefik: `--serversTransport.rootCAs=root.cert.pem`
+- add a Kubernetes Service for nioca like the following:
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nioca
+  namespace: nioca
+spec:
+  selector:
+    app: nioca
+  ports:
+    - name: https
+      port: 8443
+      targetPort: 8443
+```
+- Traefik IngressRoute definition:
+```yaml
+kind: Middleware
+metadata:
+  name: https-only
+  namespace: nioca 
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: https
+  namespace: nioca 
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ca.exmplae.com`)
+      kind: Rule
+      services:
+        - name: nioca
+          port: 8443
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: http-redirect
+  namespace: nioca
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ca.exmplae.com`)
+      priority: 1
+      kind: Rule
+      middlewares:
+        - name: https-only
+      services:
+        - name: nioca
+          port: 8443
+```
+
+
 ## Development
 
 ### sqlx compile time checked queries
