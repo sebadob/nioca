@@ -109,13 +109,13 @@ CREATE DATABASE nioca WITH OWNER nioca;
 - If you have a Postgres running on your localhost:
 
 ```
-docker run --rm -v ./.env.deploy:/.env --network="host" sdobedev/nioca
+docker run --rm -v ./.env.deploy:/.env --network="host" ghcr.io/sebadob/nioca
 ```
 
 - If you have it inside the same docker network, for instance with docker compose:
 
 ```
-docker run --rm -v ./.env.deploy:/.env -p 8080:8080 -p 8443:8443 sdobedev/nioca
+docker run --rm -v ./.env.deploy:/.env -p 8080:8080 -p 8443:8443 ghcr.io/sebadob/nioca
 ```
 
 **Note:** Currently, this step is a bit tricky. To have a "secure" TLS connection in the browser, we MUST use port 443.
@@ -155,25 +155,28 @@ come in the future which makes it possible to run the container with a non-root 
 
 ## Running behind an Ingress proxy
 
-You can run Nioca behind an ingress (Traefik in this example) as well. A reason could be because you just do not have multiple
-different IP addresses or no LoadBalancer in front for smaller setups.
+You can run Nioca behind an ingress (Traefik in this example) as well. A reason could be because you just do not have
+multiple different IP addresses or no LoadBalancer in front of smaller setups.
 
 There is currently no way (apart from using `DEV_MODE`) to start a plain HTTP server.
-You should never(!) have any unencrypted connection to Nioca, since it has one of the most critical roles in your infrastructure!
-The only situation in which you could actually start a plain HTTP server is, when you are running it behind an ingress and
-you are using a service mesh that actually warps every single connection inside mTLS anyway already.
+You should never(!) have any unencrypted connection to Nioca, since it has one of the most critical roles in your
+infrastructure!  
+The only situation in which you could actually start a plain HTTP server is, when you are running it behind an ingress,
+and you are using a service mesh that actually wraps every single connection inside mTLS anyway already.
 For this special use case, there will be an option in the future to actually start a plain HTTP server.
 For now, you will need to add the Root Certificate to Traefik if you are running Nioca behind it. You will get an
 Internal Server Error from Traefik, if you do not do this.
 
 This is a very short gist to provide a starting point.
-- set `PORT_HTTPS=8443` and `PORT_HTTPS_PUB=443` in Niocas config and restart
-- create a secret inside the `traefik` namespace or whereever your instance is running:
+
+- set `PORT_HTTPS=8443` and `PORT_HTTPS_PUB=443` in Nioca's config and restart
+- create a secret inside the `traefik` namespace or where ever your instance is running:
 ```yaml
-k3s kubectl -n traefik create secret generic root.cert.pem --from-file=root.cert.pem
+kubectl -n traefik create secret generic root.cert.pem --from-file=root.cert.pem
 ```
-- add a startup arg to traefik: `--serversTransport.rootCAs=root.cert.pem`
-- add a Kubernetes Service for nioca like the following:
+
+- add a startup arg to Traefik: `--serversTransport.rootCAs=root.cert.pem`
+- add a Kubernetes Service for Nioca like the following:
 ```yaml
 apiVersion: v1
 kind: Service
@@ -265,10 +268,10 @@ Without these keys, you will not be able to issue new certificates.
 To create a new intermediate certificate, you need the Root CA encryption key.
 To create a new end entity certificate, you need the Intermediate CA encryption key.
 
-Note: Issuing multiple intermediate CA's is currently not supported by the current nioca CLI tool.
+Note: Issuing multiple intermediate CA's is currently not supported by the current `nioca` CLI tool.
 If you need multiple Intermediates, create a new folder and just copy the 'root' content over.
 
-However, you can issue as many end entity certificates as you like. They will be created in subfolders.
+However, you can issue as many end entity certificates as you like. They will be created in sub folders.
 The folder names will match their serial numbers.
 
 ### Example for issuing a new intermediate certificate:
@@ -291,7 +294,6 @@ nioca x509 \
     --l 'Dusseldorf' \
     --o 'My Company' \
     --st 'NRW' \
-    --alt-name-ip '192.168.14.50' \
     --alt-name-dns 'ca.example.com' \
     --usages-ext server-auth \
     --usages-ext client-auth \

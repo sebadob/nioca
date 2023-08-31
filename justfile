@@ -160,6 +160,8 @@ is-clean: test build
 publish-nightly: build-image
     docker build --no-cache -f Dockerfile -t sdobedev/nioca:nightly .
     docker push sdobedev/nioca:nightly
+    docker tag sdobedev/nioca:nightly ghcr.io/sebadob/nioca:nightly
+    docker push ghcr.io/sebadob/nioca:nightly
 
 
 # publishes the application images
