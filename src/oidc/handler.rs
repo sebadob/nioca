@@ -1,7 +1,7 @@
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::oidc::cookie_state::{OidcCookieState, STATE_COOKIE};
 use crate::oidc::principal::{JwtAccessClaims, JwtIdClaims, PrincipalOidc};
-use crate::oidc::validation::{CLIENT, OIDC_CONFIG};
+use crate::oidc::validation::{OidcProvider, OIDC_CONFIG};
 use crate::oidc::{extract_token_claims, validate_access_claims, validate_id_claims};
 use axum::body::Body;
 use axum::extract::Query;
@@ -136,7 +136,11 @@ pub async fn oidc_callback(
     )
     .await;
 
-    let res = CLIENT.post(&token_uri).form(&req_data).send().await?;
+    let res = OidcProvider::client()
+        .post(&token_uri)
+        .form(&req_data)
+        .send()
+        .await?;
     if res.status().as_u16() >= 300 {
         error!("{:?}", res);
         let body = res.text().await;
