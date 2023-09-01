@@ -7,7 +7,7 @@ use crate::models::db::enc_key::EncKeyEntity;
 use crate::models::db::master_key::MasterKeyEntity;
 use crate::models::db::sealed::SealedEntity;
 use crate::oidc::validation;
-use crate::oidc::validation::{OidcConfig, TokenCacheReq};
+use crate::oidc::validation::{OidcConfig, OidcProvider, TokenCacheReq};
 use crate::util::secure_random;
 use anyhow::Context;
 use rcgen::Certificate;
@@ -115,6 +115,10 @@ impl Config {
             }
             Err(_) => None,
         };
+
+        // This builds the reqwest client with Niocas own Root CA added to the trust anchors for OIDC SSO
+        let reqwest_root_ca = reqwest::tls::Certificate::from_der(root_cert.cert_der.as_bytes())?;
+        OidcProvider::init_client(reqwest_root_ca);
 
         let config = Self {
             enc_keys,

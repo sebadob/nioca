@@ -8,22 +8,12 @@ use once_cell::sync::Lazy;
 use reqwest::header::AUTHORIZATION;
 use serde::{Deserialize, Serialize};
 use std::string::ToString;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::Duration;
 use tokio::sync::{oneshot, RwLock};
 use tracing::{debug, error, info, warn};
 
-pub(crate) static CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
-    reqwest::Client::builder()
-        .timeout(Duration::from_secs(10))
-        .connect_timeout(Duration::from_secs(10))
-        .https_only(true)
-        .user_agent(format!("Rusty OIDC Client v{}", VERSION))
-        .brotli(true)
-        .http2_prior_knowledge()
-        .build()
-        .unwrap()
-});
+pub(crate) static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
 
 pub(crate) static OIDC_CONFIG: Lazy<RwLock<Option<OidcConfig>>> = Lazy::new(|| RwLock::new(None));
 pub(crate) static USERINFO_URL: Lazy<RwLock<Option<String>>> = Lazy::new(|| RwLock::new(None));
@@ -127,9 +117,8 @@ pub struct OidcProvider {
 
 impl OidcProvider {
     pub async fn fetch(oidc_config_endpoint: &str) -> anyhow::Result<Self> {
-        let res = CLIENT
+        let res = Self::client()
             .get(oidc_config_endpoint)
-            .timeout(Duration::from_secs(10))
             .send()
             .await?
             .json::<Self>()
@@ -145,6 +134,28 @@ impl OidcProvider {
         }
 
         Ok(res)
+    }
+
+    pub fn init_client(root_certificate: reqwest::Certificate) {
+        CLIENT.get_or_init(|| {
+            reqwest::Client::builder()
+                .timeout(Duration::from_secs(10))
+                .connect_timeout(Duration::from_secs(10))
+                .https_only(true)
+                .user_agent(format!("Rusty OIDC Client v{}", VERSION))
+                .brotli(true)
+                .http2_prior_knowledge()
+                .add_root_certificate(root_certificate)
+                .timeout(Duration::from_secs(10))
+                .build()
+                .unwrap()
+        });
+    }
+
+    pub fn client<'a>() -> &'a reqwest::Client {
+        CLIENT.get().expect(
+            "OIDC Client has not been initialized - run OidcProvider::init_client() at startup",
+        )
     }
 }
 
@@ -339,7 +350,7 @@ pub async fn validate_token(
 
         // build the client inside and await outside to use the url as ref but not lock too long
         // while awaiting the result
-        CLIENT
+        OidcProvider::client()
             .get(url)
             .header(AUTHORIZATION, format!("Bearer {}", token))
             .send()
