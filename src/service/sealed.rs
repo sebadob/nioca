@@ -37,16 +37,12 @@ pub async fn init(
 
     // create keys and secrets
     let master_shard_1 = secure_random(48);
-    // let master_shard_1_check = digest::digest(&digest::SHA256, master_shard_1.as_bytes());
     let master_shard_1_check = kdf_danger_static(master_shard_1.as_bytes()).await?;
 
     let master_shard_2 = secure_random(48);
-    // let master_shard_2_check = digest::digest(&digest::SHA256, master_shard_2.as_bytes());
     let master_shard_2_check = kdf_danger_static(master_shard_2.as_bytes()).await?;
 
     let master_full = format!("{}{}", master_shard_1, master_shard_2);
-    // let master_key_digest = digest::digest(&digest::SHA256, master_full.as_bytes());
-    // let master_key_bytes = master_key_digest.as_ref();
     let master_key_hash = kdf_danger_static(master_full.as_bytes()).await?;
     let master_key_check = kdf_danger_static(master_key_hash.as_bytes()).await?;
 
@@ -249,7 +245,6 @@ pub async fn add_unseal_shard(
         ));
     }
 
-    // let digest = digest::digest(&digest::SHA256, req.key.as_bytes());
     let hash = kdf_danger_static(req.key.as_bytes()).await?;
 
     let master_key = MasterKeyEntity::build().await?;
@@ -321,7 +316,6 @@ pub async fn unseal(state: AppStateSealedExtract, req: UnsealRequest) -> Result<
     let master_shard_1 = config.enc_keys.master_shard_1.as_ref().unwrap();
     let master_shard_2 = config.enc_keys.master_shard_2.as_ref().unwrap();
     let master_full = format!("{}{}", master_shard_1, master_shard_2);
-    // let master_key_digest = digest::digest(&digest::SHA256, master_full.as_bytes());
     let master_key_hash = kdf_danger_static(master_full.as_bytes()).await?;
     // this is our master key for decryption end enc keys
     let master_key_bytes = master_key_hash.as_ref();
@@ -329,7 +323,6 @@ pub async fn unseal(state: AppStateSealedExtract, req: UnsealRequest) -> Result<
 
     // check for correctness against the hash from the db
     let mk_entity = MasterKeyEntity::build().await?;
-    // let master_key_digest = digest::digest(&digest::SHA256, master_key_bytes);
     let master_key_hash_hash = kdf_danger_static(master_key_bytes).await?;
     if mk_entity.check_master != master_key_hash_hash {
         return Err(ErrorResponse::new(
@@ -347,12 +340,9 @@ pub async fn unseal(state: AppStateSealedExtract, req: UnsealRequest) -> Result<
     let enc_uuid = Uuid::from_str(&enc_key_id).expect("Rebuilding UUID for enc kid");
     let enc_key = EncKeyEntity::find(&enc_uuid, master_key_bytes).await?;
 
-    // build EncKeys
     let enc_keys = EncKeys {
         master_shard_1: None,
-        // master_shard_1: Some(master_shard_1.clone()),
         master_shard_2: None,
-        // master_shard_2: Some(master_shard_2.clone()),
         master_key: master_key_hash,
         pepper: master_full,
         enc_key: enc_key.clone(),
@@ -361,7 +351,6 @@ pub async fn unseal(state: AppStateSealedExtract, req: UnsealRequest) -> Result<
     // find the certificates and decrypt the private key, just to make sure that everything is fine
     let _root_cert = CaCertX509Root::find_default(&enc_keys, false).await?;
     let _nioca_cert = CaCertX509Nioca::find_default(&enc_keys).await?;
-    // let signing_cert = cert_from_key_pem(&nioca_cert.key, &nioca_cert.der).await?;
 
     // if we got until here successfully, everything is ready
     // Send the enc keys over the channel for the new server process
