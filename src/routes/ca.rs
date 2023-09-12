@@ -1,7 +1,7 @@
 use crate::certificates::x509::verification::{x509_der_from_bytes, x509_pem_from_bytes};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::principal::Principal;
-use crate::models::api::request::{ExternalSshKeyRequest, GenerateSshKeyRequest};
+use crate::models::api::request::{ExternalSshKeyRequest, GenerateSshKeyRequest, X509CaAddRequest};
 use crate::models::api::response::{
     CaCertSshResponse, CasSshResponse, CasX509Response, CertificateInspectResponse,
 };
@@ -9,6 +9,7 @@ use crate::models::db::ca_cert_ssh::{CaCertSshEntity, SshKeyPairOpenssh};
 use crate::models::db::ca_cert_x509::{CaCertX509Entity, CaCertX509Type};
 use crate::models::db::groups::GroupEntity;
 use crate::routes::AppStateExtract;
+use crate::service;
 use axum::Json;
 use validator::Validate;
 use x509_parser::nom::AsBytes;
@@ -119,7 +120,7 @@ pub async fn post_external_ca_ssh(
     Ok(Json(resp))
 }
 
-/// Get the X509 CA
+/// Get the X509 CA's
 #[utoipa::path(
 get,
 tag = "ca",
@@ -156,4 +157,25 @@ pub async fn get_ca_x509(principal: Principal) -> Result<Json<CasX509Response>, 
         .collect();
     let resp = CasX509Response { cas_x509 };
     Ok(Json(resp))
+}
+
+/// Add a new X509 Intermediate CA
+#[utoipa::path(
+post,
+tag = "ca",
+path = "/api/ca/x509",
+responses(
+(status = 200, description = "Ok"),
+(status = 401, description = "Unauthorized", body = ErrorResponse),
+),
+)]
+pub async fn post_ca_x509(
+    state: AppStateExtract,
+    principal: Principal,
+    Json(payload): Json<X509CaAddRequest>,
+) -> Result<(), ErrorResponse> {
+    principal.is_admin()?;
+    payload.validate()?;
+
+    service::x509::add_x509_ca(&state.0, payload).await
 }

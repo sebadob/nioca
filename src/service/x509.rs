@@ -3,8 +3,11 @@ use crate::certificates::x509::cert_from_key_pem;
 use crate::certificates::x509::verification::{
     validate_x509, x509_der_from_bytes, x509_pem_from_bytes,
 };
+use crate::config::{AppState, Db};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
+use crate::models::api::request::X509CaAddRequest;
 use crate::models::api::response::{CertificateInitInspectResponse, CertificateInspectResponse};
+use crate::models::db::ca_cert_x509::{CaCertX509Nioca, CaCertX509Root};
 use crate::util::fingerprint;
 use time::OffsetDateTime;
 use tracing::error;
@@ -21,6 +24,43 @@ pub struct CheckedCerts {
     pub nioca_cert_pem: String,
     pub nioca_fingerprint: String,
     pub nioca_key_plain: String,
+}
+
+pub async fn add_x509_ca(state: &AppState, req: X509CaAddRequest) -> Result<(), ErrorResponse> {
+    // make sure all input data is actually correctly given and "works" together
+    let (checked_certs, _) =
+        x509_ca_validate(&req.root_pem, &req.it_pem, &req.it_key, &req.it_password).await?;
+
+    let enc_keys = state.read().await.enc_keys.clone();
+    let id = Uuid::new_v4();
+
+    let mut txn = Db::txn().await?;
+
+    CaCertX509Root::add_new(
+        &enc_keys,
+        id,
+        req.name.clone(),
+        checked_certs.root_cert_pem,
+        &checked_certs.root_fingerprint,
+        checked_certs.root_exp,
+        &mut txn,
+    )
+    .await?;
+    CaCertX509Nioca::add_new(
+        &enc_keys,
+        id,
+        req.name,
+        checked_certs.nioca_cert_pem,
+        &checked_certs.nioca_fingerprint,
+        &checked_certs.nioca_key_plain,
+        checked_certs.nioca_exp,
+        &mut txn,
+    )
+    .await?;
+
+    txn.commit().await?;
+
+    Ok(())
 }
 
 pub async fn x509_ca_validate(
