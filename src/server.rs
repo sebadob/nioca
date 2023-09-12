@@ -180,7 +180,6 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                 .route("/xsrf", get(sealed::get_xsrf)),
         )
         .nest_service("/", ServeDir::new("static"))
-        // .merge(SpaRouter::new("/", "static").index_file("static/unseal.html"))
         .layer(middleware.clone().into_inner())
         .with_state(config_sealed);
     debug!("Router created");
@@ -243,7 +242,7 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                 .route("/ca/ssh", get(ca::get_ca_ssh))
                 .route("/ca/ssh/external", post(ca::post_external_ca_ssh))
                 .route("/ca/ssh/generate", post(ca::post_generate_ca_ssh))
-                .route("/ca/x509", get(ca::get_ca_x509))
+                .route("/ca/x509", get(ca::get_ca_x509).post(ca::post_ca_x509))
                 .route(
                     "/clients/ssh",
                     get(clients_ssh::get_clients).post(clients_ssh::post_client),

@@ -1,9 +1,9 @@
-use crate::certificates::encryption::decrypt_by_kid;
+use crate::certificates::encryption::{decrypt_by_kid, encrypt};
 use crate::config::{Db, EncKeys};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::util::{fingerprint, pem_to_der};
 use der::Document;
-use sqlx::{query, query_as};
+use sqlx::{query, query_as, Postgres, Transaction};
 use time::OffsetDateTime;
 use tracing::{error, info};
 use uuid::Uuid;
@@ -20,6 +20,23 @@ pub struct CaCertX509Entity {
 }
 
 impl CaCertX509Entity {
+    pub async fn insert(&self, txn: &mut Transaction<'_, Postgres>) -> Result<(), ErrorResponse> {
+        query!(
+            r#"INSERT INTO ca_certs_x509 (id, typ, name, expires, data, fingerprint, enc_key_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)"#,
+            self.id,
+            self.typ.as_str(),
+            self.name,
+            self.expires,
+            self.data,
+            self.fingerprint,
+            self.enc_key_id,
+        )
+        .execute(&mut **txn)
+        .await?;
+        Ok(())
+    }
+
     pub async fn find_all_by_type(typ: CaCertX509Type) -> Result<Vec<Self>, ErrorResponse> {
         let res = query_as!(
             Self,
@@ -112,6 +129,30 @@ pub struct CaCertX509Root {
 }
 
 impl CaCertX509Root {
+    pub async fn add_new(
+        enc_keys: &EncKeys,
+        id: Uuid,
+        name: String,
+        cert_pem: String,
+        fingerprint: &str,
+        exp: OffsetDateTime,
+        txn: &mut Transaction<'_, Postgres>,
+    ) -> Result<(), ErrorResponse> {
+        let fingerprint = encrypt(fingerprint.as_bytes(), enc_keys.enc_key.value.as_slice())?;
+        let entity_cert = CaCertX509Entity {
+            id,
+            typ: CaCertX509Type::Root,
+            name: name.clone(),
+            expires: Some(exp),
+            data: cert_pem,
+            fingerprint: Some(fingerprint),
+            enc_key_id: enc_keys.enc_key.id,
+        };
+        entity_cert.insert(txn).await?;
+
+        Ok(())
+    }
+
     pub async fn find_default(
         enc_keys: &EncKeys,
         is_sealed: bool,
@@ -192,6 +233,47 @@ pub struct CaCertX509Nioca {
 }
 
 impl CaCertX509Nioca {
+    pub async fn add_new(
+        enc_keys: &EncKeys,
+        id: Uuid,
+        name: String,
+        cert_pem: String,
+        fingerprint: &str,
+        key_plain: &str,
+        exp: OffsetDateTime,
+        txn: &mut Transaction<'_, Postgres>,
+    ) -> Result<(), ErrorResponse> {
+        let enc_key = enc_keys.enc_key.value.as_slice();
+        let enc_key_id = enc_keys.enc_key.id;
+
+        let fingerprint = encrypt(fingerprint.as_bytes(), enc_key)?;
+        let entity_cert = CaCertX509Entity {
+            id,
+            typ: CaCertX509Type::Certificate,
+            name: name.clone(),
+            expires: Some(exp),
+            data: cert_pem,
+            fingerprint: Some(fingerprint),
+            enc_key_id,
+        };
+        entity_cert.insert(txn).await?;
+
+        let key_enc = encrypt(key_plain.as_bytes(), enc_key)?;
+        let key_enc_hex = hex::encode(key_enc);
+        let entity_key = CaCertX509Entity {
+            id,
+            typ: CaCertX509Type::Key,
+            name,
+            expires: None,
+            data: key_enc_hex,
+            fingerprint: None,
+            enc_key_id,
+        };
+        entity_key.insert(txn).await?;
+
+        Ok(())
+    }
+
     pub async fn find_default(enc_keys: &EncKeys) -> Result<CaCertX509Nioca, ErrorResponse> {
         let cert_entity = CaCertX509Entity::find_default(CaCertX509Type::Certificate).await?;
         let key_entity = CaCertX509Entity::find_default(CaCertX509Type::Key).await?;

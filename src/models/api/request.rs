@@ -182,18 +182,30 @@ pub struct UnsealRequest {
     pub xsrf: String,
 }
 
+// #[derive(Debug, Deserialize, Validate, ToSchema)]
+// #[serde(rename_all = "camelCase")]
+// pub struct X509Request {
+//     pub root_pem: String,
+//     pub it_pem: String,
+//     #[validate(regex(path = "RE_HEX", code = "[a-fA-F0-9]"))]
+//     pub it_key: String,
+//     pub it_password: String,
+//     #[validate(regex(path = "RE_INIT_KEY", code = "[a-zA-Z0-9]{32}"))]
+//     pub init_key: String,
+//     #[validate(regex(path = "RE_XSRF", code = "[a-zA-Z0-9]{48}"))]
+//     pub xsrf_key: String,
+// }
+
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct X509Request {
+pub struct X509CaAddRequest {
+    #[validate(regex(path = "RE_CA_NAME", code = "[a-zA-Z0-9\\-_.\\s]+"))]
+    pub name: String,
     pub root_pem: String,
     pub it_pem: String,
     #[validate(regex(path = "RE_HEX", code = "[a-fA-F0-9]"))]
     pub it_key: String,
     pub it_password: String,
-    #[validate(regex(path = "RE_INIT_KEY", code = "[a-zA-Z0-9]{32}"))]
-    pub init_key: String,
-    #[validate(regex(path = "RE_XSRF", code = "[a-zA-Z0-9]{48}"))]
-    pub xsrf_key: String,
 }
 
 fn validate_vec_dns_simple(value: &[String]) -> Result<(), ValidationError> {
