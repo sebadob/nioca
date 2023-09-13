@@ -1,7 +1,7 @@
 use crate::constants::UNSEAL_RATE_LIMIT;
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::request::{AddMasterShardRequest, InitRequest, UnsealRequest};
-use crate::models::api::response::{CertificateInitInspectResponse, InitResponse, SealedStatus};
+use crate::models::api::response::{InitResponse, SealedStatus, X509CertificatesInspectResponse};
 use crate::routes::AppStateSealedExtract;
 use crate::service::sealed::{add_unseal_shard, init, init_values_check, unseal};
 use axum::Json;
@@ -43,7 +43,7 @@ pub async fn post_init(
 pub async fn post_init_check(
     state: AppStateSealedExtract,
     Json(payload): Json<InitRequest>,
-) -> Result<Json<CertificateInitInspectResponse>, ErrorResponse> {
+) -> Result<Json<X509CertificatesInspectResponse>, ErrorResponse> {
     payload.validate()?;
     check_init_state(&state).await?;
 

@@ -68,9 +68,16 @@ pub struct CasX509Response {
 
 #[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct CertificateInitInspectResponse {
+pub struct X509CertificatesInspectResponse {
     pub root: CertificateInspectResponse,
     pub intermediate: CertificateInspectResponse,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct X509CertificatesOptInspectResponse {
+    pub root: Option<CertificateInspectResponse>,
+    pub intermediate: Option<CertificateInspectResponse>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]

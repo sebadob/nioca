@@ -3,7 +3,7 @@ use crate::config::{ConfigSealed, Db, EncKeys};
 use crate::constants::{DEV_MODE, INSTANCE_UUID, UNSEAL_RATE_LIMIT};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::request::{AddMasterShardRequest, InitRequest, UnsealRequest};
-use crate::models::api::response::{CertificateInitInspectResponse, InitResponse, SealedStatus};
+use crate::models::api::response::{InitResponse, SealedStatus, X509CertificatesInspectResponse};
 use crate::models::db::ca_cert_x509::{CaCertX509Nioca, CaCertX509Root, CaCertX509Type};
 use crate::models::db::enc_key::EncKeyEntity;
 use crate::models::db::master_key::MasterKeyEntity;
@@ -190,7 +190,7 @@ pub async fn init(
 pub async fn init_values_check(
     state: &ConfigSealed,
     req: &InitRequest,
-) -> Result<(CheckedCerts, CertificateInitInspectResponse), ErrorResponse> {
+) -> Result<(CheckedCerts, X509CertificatesInspectResponse), ErrorResponse> {
     // check init key
     if state.init_key.as_ref().unwrap() != &req.init_key {
         return Err(ErrorResponse::new(
