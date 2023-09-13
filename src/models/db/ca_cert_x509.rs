@@ -37,11 +37,24 @@ impl CaCertX509Entity {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub async fn find_all_by_type(typ: CaCertX509Type) -> Result<Vec<Self>, ErrorResponse> {
         let res = query_as!(
             Self,
             "SELECT * FROM ca_certs_x509 WHERE typ = $1",
             typ.as_str()
+        )
+        .fetch_all(Db::conn())
+        .await?;
+        Ok(res)
+    }
+
+    pub async fn find_all_certs() -> Result<Vec<Self>, ErrorResponse> {
+        let res = query_as!(
+            Self,
+            "SELECT * FROM ca_certs_x509 WHERE typ = $1 OR typ = $2",
+            CaCertX509Type::Root.as_str(),
+            CaCertX509Type::Certificate.as_str(),
         )
         .fetch_all(Db::conn())
         .await?;

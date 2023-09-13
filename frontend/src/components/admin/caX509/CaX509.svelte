@@ -14,7 +14,7 @@
         let res = await fetchGetCAsX509();
         let body = await res.json();
         if (res.ok) {
-            cas = body.casX509;
+            cas = body;
         } else {
             err = body.message;
         }
@@ -26,16 +26,26 @@
 
 <div class="container">
 
-    {#each cas as ca (ca.serial)}
+    {#each Object.values(cas) as ca (ca.root.id)}
         <div class="cert">
             <div class="certHeader">
-                <b>{ca.name}</b>
+                <b>{`${ca.intermediate.name} - intermediate`}</b>
                 <br/>
                 <span class="font-mono">
-                    {ca.id}
+                    {ca.intermediate.id}
                 </span>
             </div>
-            <X509Contents cert={ca}/>
+            <X509Contents cert={ca.intermediate}/>
+        </div>
+        <div class="cert">
+            <div class="certHeader">
+                <b>{`${ca.root.name} - root`}</b>
+                <br/>
+                <span class="font-mono">
+                    {ca.root.id}
+                </span>
+            </div>
+            <X509Contents cert={ca.root}/>
         </div>
     {/each}
 </div>

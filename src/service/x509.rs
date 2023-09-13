@@ -6,7 +6,7 @@ use crate::certificates::x509::verification::{
 use crate::config::{AppState, Db};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::request::X509CaAddRequest;
-use crate::models::api::response::{CertificateInitInspectResponse, CertificateInspectResponse};
+use crate::models::api::response::{CertificateInspectResponse, X509CertificatesInspectResponse};
 use crate::models::db::ca_cert_x509::{CaCertX509Nioca, CaCertX509Root};
 use crate::util::fingerprint;
 use time::OffsetDateTime;
@@ -69,7 +69,7 @@ pub async fn x509_ca_validate(
     it_pem: &str,
     it_key: &str,
     it_password: &str,
-) -> Result<(CheckedCerts, CertificateInitInspectResponse), ErrorResponse> {
+) -> Result<(CheckedCerts, X509CertificatesInspectResponse), ErrorResponse> {
     // try to serialize the certificates
 
     // root certificate
@@ -185,7 +185,7 @@ pub async fn x509_ca_validate(
 
     // build the API response
     let name = "default".to_string();
-    let resp = CertificateInitInspectResponse {
+    let resp = X509CertificatesInspectResponse {
         root: CertificateInspectResponse::from_certificate(
             Uuid::default(),
             name.clone(),

@@ -60,7 +60,7 @@ use utoipa::{openapi, OpenApi};
             request::UnsealRequest,
             response::CasSshResponse,
         response::CasX509Response,
-            response::CertificateInitInspectResponse,
+        response::X509CertificatesInspectResponse,
             response::CertificateInspectResponse,
             response::CertX509Response,
             response::ClientSshResponse,
