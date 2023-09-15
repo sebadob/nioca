@@ -77,7 +77,9 @@ pub struct X509CertificatesInspectResponse {
 #[serde(rename_all = "camelCase")]
 pub struct X509CertificatesOptInspectResponse {
     pub root: Option<CertificateInspectResponse>,
+    pub root_pem: Option<String>,
     pub intermediate: Option<CertificateInspectResponse>,
+    pub intermediate_pem: Option<String>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]

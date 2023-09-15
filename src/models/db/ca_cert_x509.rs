@@ -37,7 +37,6 @@ impl CaCertX509Entity {
         Ok(())
     }
 
-    #[allow(dead_code)]
     pub async fn find_all_by_type(typ: CaCertX509Type) -> Result<Vec<Self>, ErrorResponse> {
         let res = query_as!(
             Self,

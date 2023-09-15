@@ -4,7 +4,7 @@ use crate::models::api::principal::Principal;
 use crate::models::api::request::{ExternalSshKeyRequest, GenerateSshKeyRequest, X509CaAddRequest};
 use crate::models::api::response::{
     CaCertSshResponse, CasSshResponse, CasX509Response, CertificateInspectResponse,
-    X509CertificatesInspectResponse, X509CertificatesOptInspectResponse,
+    X509CertificatesOptInspectResponse,
 };
 use crate::models::db::ca_cert_ssh::{CaCertSshEntity, SshKeyPairOpenssh};
 use crate::models::db::ca_cert_x509::{CaCertX509Entity, CaCertX509Type};
@@ -13,7 +13,6 @@ use crate::routes::AppStateExtract;
 use crate::service;
 use axum::Json;
 use std::collections::HashMap;
-use uuid::Uuid;
 use validator::Validate;
 use x509_parser::nom::AsBytes;
 
@@ -123,7 +122,7 @@ pub async fn post_external_ca_ssh(
     Ok(Json(resp))
 }
 
-/// Get the X509 CA's
+/// Get the X509 intermediate CA's
 #[utoipa::path(
 get,
 tag = "ca",
@@ -133,34 +132,49 @@ responses(
 (status = 401, description = "Unauthorized", body = ErrorResponse),
 ),
 )]
-pub async fn get_ca_x509(
+pub async fn get_ca_x509(principal: Principal) -> Result<Json<CasX509Response>, ErrorResponse> {
+    principal.is_admin()?;
+
+    let cas_x509 = CaCertX509Entity::find_all_by_type(CaCertX509Type::Certificate)
+        .await?
+        .drain(..)
+        // TODO necessary cache response for some longer time?
+        .filter_map(|cert_entity| {
+            if let Ok(pem) = x509_pem_from_bytes(cert_entity.data.as_bytes()).map_err(|err| {
+                ErrorResponse::new(
+                    ErrorResponseType::BadRequest,
+                    format!("Bad PEM: {}", err.message),
+                )
+            }) {
+                if let Ok(cert) = x509_der_from_bytes(pem.contents.as_bytes()) {
+                    return Some(CertificateInspectResponse::from_certificate(
+                        cert_entity.id,
+                        cert_entity.name,
+                        cert,
+                    ));
+                }
+            }
+            None
+        })
+        .collect();
+    let resp = CasX509Response { cas_x509 };
+    Ok(Json(resp))
+}
+
+/// Get the full X509 CA's
+#[utoipa::path(
+get,
+tag = "ca",
+path = "/api/ca/x509/inspect",
+responses(
+(status = 200, description = "Ok", body = CasX509Response),
+(status = 401, description = "Unauthorized", body = ErrorResponse),
+),
+)]
+pub async fn get_ca_x509_inspect(
     principal: Principal,
 ) -> Result<Json<HashMap<String, X509CertificatesOptInspectResponse>>, ErrorResponse> {
     principal.is_admin()?;
-
-    // let cas_x509 = CaCertX509Entity::find_all_certs()
-    //     .await?
-    //     .drain(..)
-    //     // TODO necessary cache response for some longer time?
-    //     .filter_map(|cert_entity| {
-    //         if let Ok(pem) = x509_pem_from_bytes(cert_entity.data.as_bytes()).map_err(|err| {
-    //             ErrorResponse::new(
-    //                 ErrorResponseType::BadRequest,
-    //                 format!("Bad PEM: {}", err.message),
-    //             )
-    //         }) {
-    //             if let Ok(cert) = x509_der_from_bytes(pem.contents.as_bytes()) {
-    //                 return Some(CertificateInspectResponse::from_certificate(
-    //                     cert_entity.id,
-    //                     cert_entity.name,
-    //                     cert,
-    //                 ));
-    //             }
-    //         }
-    //         None
-    //     })
-    //     .collect();
-    // let resp = CasX509Response { cas_x509 };
 
     let cas_x509 = CaCertX509Entity::find_all_certs().await?;
 
@@ -169,7 +183,7 @@ pub async fn get_ca_x509(
 
     cas_x509
         .into_iter()
-        // TODO necessary cache response for some longer time?
+        // TODO necessary to cache response for some longer time?
         .for_each(|cert_entity| {
             if let Ok(pem) = x509_pem_from_bytes(cert_entity.data.as_bytes()).map_err(|err| {
                 ErrorResponse::new(
@@ -190,12 +204,16 @@ pub async fn get_ca_x509(
                             let value = if cert_entity.typ == CaCertX509Type::Root {
                                 X509CertificatesOptInspectResponse {
                                     root: Some(inspect),
+                                    root_pem: Some(cert_entity.data),
                                     intermediate: None,
+                                    intermediate_pem: None,
                                 }
                             } else {
                                 X509CertificatesOptInspectResponse {
                                     root: None,
+                                    root_pem: None,
                                     intermediate: Some(inspect),
+                                    intermediate_pem: Some(cert_entity.data),
                                 }
                             };
                             resp.insert(id, value);
@@ -203,8 +221,10 @@ pub async fn get_ca_x509(
                         Some(value) => {
                             if cert_entity.typ == CaCertX509Type::Root {
                                 value.root = Some(inspect);
+                                value.root_pem = Some(cert_entity.data);
                             } else {
                                 value.intermediate = Some(inspect);
+                                value.intermediate_pem = Some(cert_entity.data);
                             };
                         }
                     }

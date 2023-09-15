@@ -1,20 +1,20 @@
 <script>
-	import { fade } from "svelte/transition";
-	import { adminNavWidth } from "../../stores/adminNav.js";
+    import {fade} from "svelte/transition";
+    import {adminNavWidth} from "../../stores/adminNav.js";
 
-	const tDur = 200;
+    const tDur = 200;
 
-	let navWidth = '190px';
-	adminNavWidth.subscribe(w => navWidth = `${w}px`);
+    let navWidth = '190px';
+    adminNavWidth.subscribe(w => navWidth = `${w}px`);
 </script>
 
 <div
-    class="content"
-    style="left: {navWidth}; width: calc(100vw - {navWidth})"
-    in:fade|global={{delay: tDur, duration: tDur}}
-    out:fade|global={{duration: tDur}}
+        class="content"
+        style="left: {navWidth}; width: calc(100vw - {navWidth})"
+        in:fade|global={{delay: tDur, duration: tDur}}
+        out:fade|global={{duration: tDur}}
 >
-  <slot></slot>
+    <slot></slot>
 </div>
 
 <style>
@@ -25,7 +25,6 @@
         display: flex;
         flex-direction: column;
         flex: 1;
-        justify-content: center;
         align-items: center;
         overflow-y: auto;
     }

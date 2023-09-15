@@ -243,6 +243,7 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                 .route("/ca/ssh/external", post(ca::post_external_ca_ssh))
                 .route("/ca/ssh/generate", post(ca::post_generate_ca_ssh))
                 .route("/ca/x509", get(ca::get_ca_x509).post(ca::post_ca_x509))
+                .route("/ca/x509/inspect", get(ca::get_ca_x509_inspect))
                 .route(
                     "/clients/ssh",
                     get(clients_ssh::get_clients).post(clients_ssh::post_client),
