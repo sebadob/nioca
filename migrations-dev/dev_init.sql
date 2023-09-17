@@ -32,8 +32,8 @@ values ('check_shard_1', 'ab5d3ea3ed2ec757e95a08a354b882dd111799391c18e15550f992
        ('enc_key_active', '7aa5066e-39d2-4de7-aeb0-e7a411afa5d9'),
        ('initialized', '1692806548'),
        ('local_password',
-        '$argon2id$v=19$m=32768,t=3,p=2$QiOSgFFrrJQR1qoMDSlf/w$Zfj1pMInly7geW+W4Q7MDzCIOEql+P7iXnhO0iIb9xs'),
-       ('default_x509', '4dc0e30d-e845-46a9-8d22-590470990da6');
+        '$argon2id$v=19$m=32768,t=3,p=2$QiOSgFFrrJQR1qoMDSlf/w$Zfj1pMInly7geW+W4Q7MDzCIOEql+P7iXnhO0iIb9xs');
+--        ('default_x509', '4dc0e30d-e845-46a9-8d22-590470990da6');
 
 insert into enc_keys (id, alg, value)
 values ('7aa5066e-39d2-4de7-aeb0-e7a411afa5d9', 'ChaCha20Poly1305',

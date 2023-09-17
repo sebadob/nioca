@@ -7,8 +7,8 @@
     import TODO from "../TODO.svelte";
     import ClientsSsh from "./clientsSsh/ClientsSsh.svelte";
     import ClientsX509 from "./clientsX509/ClientsX509.svelte";
-    import CaSsh from "./caSsh/CaSsh.svelte";
-    import CaX509 from "./caX509/CaMainX509.svelte";
+    import CaSsh from "./caSsh/CaSshMain.svelte";
+    import CaX509 from "./caX509/CaX509Main.svelte";
     import Password from "./password/Password.svelte";
     import Groups from "./groups/Groups.svelte";
 

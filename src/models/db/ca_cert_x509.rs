@@ -67,7 +67,7 @@ impl CaCertX509Entity {
             Self,
             r#"SELECT * FROM ca_certs_x509
             WHERE typ = $1
-            AND id = (SELECT uuid(value) FROM master_key WHERE id = 'default_x509')"#,
+            AND id = (SELECT uuid(ca_x509) FROM groups WHERE name = 'default')"#,
             typ.as_str(),
         )
         .fetch_one(Db::conn())
