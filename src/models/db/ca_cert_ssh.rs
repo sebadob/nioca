@@ -112,6 +112,13 @@ impl CaCertSshEntity {
         Ok(res)
     }
 
+    pub async fn delete_by_id(id: &Uuid) -> Result<(), ErrorResponse> {
+        query!("DELETE FROM ca_certs_ssh WHERE id = $1", id)
+            .execute(Db::conn())
+            .await?;
+        Ok(())
+    }
+
     pub async fn get_private_key(&self, enc_keys: &EncKeys) -> Result<PrivateKey, ErrorResponse> {
         if self.enc_key_id != enc_keys.enc_key.id {
             let enc_key = EncKeyEntity::find(&self.enc_key_id, &enc_keys.master_key).await?;

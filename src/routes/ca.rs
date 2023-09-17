@@ -125,6 +125,26 @@ pub async fn post_external_ca_ssh(
     Ok(Json(resp))
 }
 
+/// Deletes an unused SSH CA
+#[utoipa::path(
+delete,
+tag = "ca",
+path = "/api/ca/ssh/:id",
+responses(
+(status = 200, description = "Ok"),
+(status = 401, description = "Unauthorized", body = ErrorResponse),
+),
+)]
+pub async fn delete_ca_ssh(
+    principal: Principal,
+    Path(id): Path<String>,
+) -> Result<(), ErrorResponse> {
+    principal.is_admin()?;
+    let id = Uuid::from_str(&id)?;
+    CaCertSshEntity::delete_by_id(&id).await?;
+    Ok(())
+}
+
 /// Get the X509 intermediate CA's
 #[utoipa::path(
 get,

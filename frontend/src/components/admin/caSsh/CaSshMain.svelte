@@ -1,10 +1,11 @@
 <script>
-    import {fetchGetCAsSsh} from "../../../utils/dataFetching.js";
+    import {fetchGetCAsSsh, fetchGetGroups} from "../../../utils/dataFetching.js";
     import {onMount} from "svelte";
     import CaSshInit from "./CaSshInit.svelte";
     import CaSshContainer from "./CaSshContainer.svelte";
 
     let cas;
+    let groups = [];
     let err = '';
     let isInitialized = false;
 
@@ -14,6 +15,7 @@
 
     onMount(() => {
         fetchCAs();
+        fetchGroups();
     });
 
     async function fetchCAs() {
@@ -29,6 +31,16 @@
         }
     }
 
+    async function fetchGroups() {
+        let res = await fetchGetGroups();
+        if (!res.ok) {
+            let body = await res.json();
+            err = 'Error fetching groups: ' + body.message;
+        } else {
+            groups = await res.json();
+        }
+    }
+
 </script>
 
 {err}
@@ -36,7 +48,7 @@
 <div class="container">
     {#if cas}
         {#if isInitialized}
-            <CaSshContainer bind:cas={cas.casSsh}/>
+            <CaSshContainer bind:cas={cas.casSsh} bind:groups onSave={fetchCAs}/>
         {:else}
             <CaSshInit bind:cas/>
         {/if}
@@ -46,7 +58,6 @@
 <style>
     .container {
         display: flex;
-        flex: 1;
         width: 100%;
         margin: 30px;
     }
