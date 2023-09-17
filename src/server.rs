@@ -15,7 +15,7 @@ use axum::handler::HandlerWithoutStateExt;
 use axum::headers::HeaderValue;
 use axum::http::{header, HeaderName, StatusCode, Uri};
 use axum::response::Redirect;
-use axum::routing::{get, post, put};
+use axum::routing::{delete, get, post, put};
 use axum::{extract, BoxError, Router};
 use axum_server::tls_rustls::RustlsConfig;
 use axum_server::Handle;
@@ -244,6 +244,7 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                 .route("/ca/ssh/generate", post(ca::post_generate_ca_ssh))
                 .route("/ca/x509", get(ca::get_ca_x509).post(ca::post_ca_x509))
                 .route("/ca/x509/inspect", get(ca::get_ca_x509_inspect))
+                .route("/ca/x509/:id", delete(ca::delete_ca_x509))
                 .route(
                     "/clients/ssh",
                     get(clients_ssh::get_clients).post(clients_ssh::post_client),

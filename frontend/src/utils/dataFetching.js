@@ -81,6 +81,13 @@ export async function fetchPostCAX509(data) {
 	});
 }
 
+export async function fetchDeleteCAX509(id) {
+	return await fetch(`/api/ca/x509/${id}`, {
+		method: 'DELETE',
+		headers: HEADERS_XSRF,
+	});
+}
+
 export async function fetchGenerateCASshRoot(data) {
 	return await fetch('/api/ca/ssh/generate', {
 		method: 'POST',
