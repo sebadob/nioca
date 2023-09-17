@@ -100,7 +100,7 @@
     </div>
 
     <div slot="body">
-        <!-- Client Name -->
+        <!-- CA Name -->
         <div class="data">
             <Input
                     name="name"
