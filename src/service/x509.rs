@@ -170,7 +170,7 @@ pub async fn x509_ca_validate(
         }
     };
     // try to rebuild the full intermediate certificate
-    let _it_cert_full = cert_from_key_pem(&ca_key_plain, &it_pem)?;
+    let _it_cert_full = cert_from_key_pem(&ca_key_plain, it_pem)?;
 
     // everything is valid
     let checked_certs = CheckedCerts {

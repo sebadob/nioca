@@ -1,6 +1,6 @@
 [package]
 name = "nioca"
-version = "0.4.0"
+version = "0.4.0-20230917"
 edition = "2021"
 authors = ["Sebastian Dobe <sebastiandobe@mailbox.org>"]
 license = "AGPLv3"
@@ -16,11 +16,11 @@ anyhow = "1.0"
 argon2 = { version = "0.5", features = ["std", "zeroize"] }
 async-trait = "0.1"
 axum = { version = "0.6", features = ["headers", "http2"] }
-axum-extra = { version = "0.7", features = ["cookie"] }
+axum-extra = { version = "0.8", features = ["cookie"] }
 axum-server = { version = "0.5.1", features = ["tls-rustls"] }
 base64 = "0.21"
 bincode = "1.3"
-cached = { version = "0.44.0", features = ["async_tokio_rt_multi_thread"] }
+cached = { version = "0.45", features = ["async_tokio_rt_multi_thread"] }
 chacha20poly1305 = { version = "0.10", features = ["std"] }
 chrono = { version = "0.4", default-features = false, features = ["serde"] }
 clap = { version = "4.1", features = ["derive"] }
