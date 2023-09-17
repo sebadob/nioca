@@ -2,6 +2,7 @@
     import {fetchGetCAsX509Inspect} from "../../../utils/dataFetching.js";
     import {onMount} from "svelte";
     import CaX509Tile from "./CaX509Tile.svelte";
+    import CaX509AddNew from "./CaX509AddNew.svelte";
 
     let cas = [];
     let err = '';
@@ -26,6 +27,8 @@
 
 <div class="container">
 
+    <CaX509AddNew onSave={fetchCAs}/>
+
     {#each Object.values(cas) as ca (ca.root.id)}
         <CaX509Tile bind:ca/>
     {/each}
@@ -34,6 +37,7 @@
 <style>
     .container {
         display: flex;
+        flex-direction: column;
         flex: 1;
         width: 100%;
         margin: 30px;

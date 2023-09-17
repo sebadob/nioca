@@ -73,6 +73,14 @@ export async function fetchGetCAsX509Inspect() {
 	});
 }
 
+export async function fetchPostCAX509(data) {
+	return await fetch('/api/ca/x509', {
+		method: 'POST',
+		headers: HEADERS_XSRF,
+		body: JSON.stringify(data),
+	});
+}
+
 export async function fetchGenerateCASshRoot(data) {
 	return await fetch('/api/ca/ssh/generate', {
 		method: 'POST',
