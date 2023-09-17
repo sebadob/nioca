@@ -103,7 +103,7 @@ impl Config {
 
         let root_cert = CaCertX509Root::find_default(&enc_keys, false).await?;
         let nioca_cert = CaCertX509Nioca::find_default(&enc_keys).await?;
-        let nioca_signing_cert = cert_from_key_pem(&nioca_cert.key, &nioca_cert.cert_pem).await?;
+        let nioca_signing_cert = cert_from_key_pem(&nioca_cert.key, &nioca_cert.cert_pem)?;
         let ca_chain_pem = format!("{}\n{}", nioca_cert.cert_pem, root_cert.cert_pem);
 
         let tx_token_cache = match ConfigOidcEntity::find(&enc_keys).await {

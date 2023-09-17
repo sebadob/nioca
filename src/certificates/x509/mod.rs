@@ -31,7 +31,7 @@ pub async fn cert_from_key_der(
     Ok(cert)
 }
 
-pub async fn cert_from_key_pem(key: &str, cert_pem: &str) -> Result<Certificate, anyhow::Error> {
+pub fn cert_from_key_pem(key: &str, cert_pem: &str) -> Result<Certificate, anyhow::Error> {
     // build key pair from the private key
     let key_pair = match rcgen::KeyPair::from_pem(key) {
         Ok(kp) => kp,

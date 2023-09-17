@@ -1,8 +1,10 @@
 use crate::certificates::encryption::{decrypt_by_kid, encrypt};
+use crate::certificates::x509::cert_from_key_pem;
 use crate::config::{Db, EncKeys};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::util::{fingerprint, pem_to_der};
 use der::Document;
+use rcgen::Certificate;
 use sqlx::{query, query_as, Postgres, Transaction};
 use time::OffsetDateTime;
 use tracing::{error, info};
@@ -73,7 +75,6 @@ impl CaCertX509Entity {
         Ok(slf)
     }
 
-    #[allow(dead_code)]
     pub async fn find_by_id(id: &Uuid, typ: CaCertX509Type) -> Result<Self, ErrorResponse> {
         let slf = query_as!(
             Self,
@@ -83,6 +84,13 @@ impl CaCertX509Entity {
         )
         .fetch_one(Db::conn())
         .await?;
+        Ok(slf)
+    }
+
+    pub async fn find_all_by_id(id: &Uuid) -> Result<Vec<Self>, ErrorResponse> {
+        let slf = query_as!(Self, "SELECT * FROM ca_certs_x509 WHERE id = $1", id,)
+            .fetch_all(Db::conn())
+            .await?;
         Ok(slf)
     }
 
@@ -306,7 +314,7 @@ impl CaCertX509Nioca {
         Self::build(cert_entity, key_entity, enc_keys).await
     }
 
-    async fn build(
+    pub async fn build(
         cert_entity: CaCertX509Entity,
         key_entity: CaCertX509Entity,
         enc_keys: &EncKeys,
@@ -383,5 +391,53 @@ impl CaCertX509Nioca {
             key,
             fingerprint: fingerprint_str,
         })
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CaCertX509Full {
+    pub root: CaCertX509Root,
+    pub intermediate: CaCertX509Nioca,
+    // pub signing_cert: Certificate,
+    pub ca_chain_pem: String,
+}
+
+impl CaCertX509Full {
+    pub async fn build_by_id(id: &Uuid, enc_keys: &EncKeys) -> Result<Self, ErrorResponse> {
+        let entities = CaCertX509Entity::find_all_by_id(id).await?;
+        // TODO remove assertion after testing
+        assert_eq!(entities.len(), 3);
+
+        let mut root = None;
+        let mut it = None;
+        let mut key = None;
+        for entity in entities {
+            match entity.typ {
+                CaCertX509Type::Unknown => panic!("Corrupted Database for CaCertX509Entity"),
+                CaCertX509Type::Root => root = Some(entity),
+                CaCertX509Type::Certificate => it = Some(entity),
+                CaCertX509Type::Key => key = Some(entity),
+            }
+        }
+        let root = root.expect("root x509 missing in CaCertX509Full::build_by_id()");
+        let it = it.expect("it x509 missing in CaCertX509Full::build_by_id()");
+        let key = key.expect("key x509 missing in CaCertX509Full::build_by_id()");
+
+        let root = CaCertX509Root::build(root, enc_keys, false).await?;
+        let intermediate = CaCertX509Nioca::build(it, key, enc_keys).await?;
+        // let signing_cert = cert_from_key_pem(&intermediate.key, &intermediate.cert_pem).await?;
+        let ca_chain_pem = format!("{}\n{}", intermediate.cert_pem, root.cert_pem);
+
+        Ok(Self {
+            root,
+            intermediate,
+            // signing_cert,
+            ca_chain_pem,
+        })
+    }
+
+    pub fn signing_cert(&self) -> Result<Certificate, ErrorResponse> {
+        let res = cert_from_key_pem(&self.intermediate.key, &self.intermediate.cert_pem)?;
+        Ok(res)
     }
 }

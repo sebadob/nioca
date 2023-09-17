@@ -7,6 +7,7 @@ use crate::config::{Db, EncKeys};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::request::ClientX509Request;
 use crate::models::api::response::CertX509Response;
+use crate::models::db::ca_cert_x509::CaCertX509Full;
 use crate::models::db::cert_x509::CertX509Entity;
 use crate::models::db::enc_key::EncKeyEntity;
 use crate::models::db::groups::GroupEntity;
@@ -243,7 +244,8 @@ impl ClientX509Entity {
     /// Creates a new x509 certificate for this client and saves the information in the DB
     pub async fn build_cert(
         &self,
-        state: AppStateExtract,
+        // state: AppStateExtract,
+        ca: &CaCertX509Full,
         cert_format: CertFormat,
         // Optional password in case of CertFormat::PKCS12
         password: Option<&str>,
@@ -341,16 +343,17 @@ impl ClientX509Entity {
         let cert = Certificate::from_params(params)?;
 
         let (cert_der, cert_pem, cert_chain) = {
-            let signing_cert = &state.read().await.nioca_signing_cert;
+            // let signing_cert = &state.read().await.nioca_signing_cert;
+            let signing_cert = ca.signing_cert()?;
             // let cert_der = cert.serialize_der_with_signer(signing_cert)?;
             let cert_pem = cert
-                .serialize_pem_with_signer(signing_cert)?
+                .serialize_pem_with_signer(&signing_cert)?
                 // For some reason, this is getting created with CRLF
                 .replace("\r\n", "\n");
             let cert_der = pem_to_der(&cert_pem).unwrap().to_vec();
 
-            let ca_chain = &state.read().await.ca_chain_pem;
-            let cert_chain = format!("{}{}", cert_pem, ca_chain);
+            // let ca_chain = &state.read().await.ca_chain_pem;
+            let cert_chain = format!("{}{}", cert_pem, ca.ca_chain_pem);
             (cert_der, cert_pem, cert_chain)
         };
 
@@ -417,13 +420,14 @@ impl ClientX509Entity {
 
                 let password = if let Some(p) = password { p } else { "" };
 
-                let lock = state.read().await;
-                let root_der = lock.root_cert.cert_der.as_ref();
-                let nioca_der = lock.nioca_cert.cert_der.as_ref();
+                // let lock = state.read().await;
+                // let root_der = lock.root_cert.cert_der.as_ref();
+                // let nioca_der = lock.nioca_cert.cert_der.as_ref();
                 let pfx = match PFX::new_with_cas(
                     &cert_der,
                     &key,
-                    &[root_der, nioca_der],
+                    &[ca.root.cert_der.as_ref(), ca.intermediate.cert_der.as_ref()],
+                    // &[root_der, nioca_der],
                     password,
                     &self.name,
                 ) {
@@ -459,7 +463,7 @@ impl ClientX509Entity {
         &self,
         state: AppStateExtract,
         api_key: &str,
-    ) -> Result<(), ErrorResponse> {
+    ) -> Result<Uuid, ErrorResponse> {
         if !self.enabled {
             return Err(ErrorResponse::new(
                 ErrorResponseType::Unauthorized,
@@ -487,6 +491,12 @@ impl ClientX509Entity {
                 "Group is disabled".to_string(),
             ));
         }
+        let ca_id = group.ca_x509.ok_or_else(|| {
+            ErrorResponse::new(
+                ErrorResponseType::Internal,
+                "This groups has no linked CA".to_string(),
+            )
+        })?;
 
         let enc_keys = state.read().await.enc_keys.clone();
         let client_key = self.decrypt_api_key(&enc_keys).await?;
@@ -498,7 +508,7 @@ impl ClientX509Entity {
             ));
         }
 
-        Ok(())
+        Ok(ca_id)
     }
 }
 
