@@ -1,14 +1,16 @@
 <script>
-    import {fetchGetCAsX509Inspect} from "../../../utils/dataFetching.js";
+    import {fetchGetCAsX509Inspect, fetchGetGroups} from "../../../utils/dataFetching.js";
     import {onMount} from "svelte";
     import CaX509Tile from "./CaX509Tile.svelte";
     import CaX509AddNew from "./CaX509AddNew.svelte";
 
     let cas = [];
+    let groups = [];
     let err = '';
 
     onMount(() => {
         fetchCAs();
+        fetchGroups();
     });
 
     async function fetchCAs() {
@@ -21,6 +23,16 @@
         }
     }
 
+    async function fetchGroups() {
+        let res = await fetchGetGroups();
+        if (!res.ok) {
+            let body = await res.json();
+            err = 'Error fetching groups: ' + body.message;
+        } else {
+            groups = await res.json();
+        }
+    }
+
 </script>
 
 {err}
@@ -30,7 +42,7 @@
     <CaX509AddNew onSave={fetchCAs}/>
 
     {#each Object.values(cas) as ca (ca.root.id)}
-        <CaX509Tile bind:ca/>
+        <CaX509Tile bind:ca bind:groups onSave={fetchCAs}/>
     {/each}
 </div>
 

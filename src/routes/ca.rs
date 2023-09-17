@@ -11,8 +11,11 @@ use crate::models::db::ca_cert_x509::{CaCertX509Entity, CaCertX509Type};
 use crate::models::db::groups::GroupEntity;
 use crate::routes::AppStateExtract;
 use crate::service;
+use axum::extract::Path;
 use axum::Json;
 use std::collections::HashMap;
+use std::str::FromStr;
+use uuid::Uuid;
 use validator::Validate;
 use x509_parser::nom::AsBytes;
 
@@ -252,6 +255,25 @@ pub async fn post_ca_x509(
 ) -> Result<(), ErrorResponse> {
     principal.is_admin()?;
     payload.validate()?;
-
     service::x509::add_x509_ca(&state.0, payload).await
+}
+
+/// Deletes an unused X509 CA
+#[utoipa::path(
+delete,
+tag = "ca",
+path = "/api/ca/x509/:id",
+responses(
+(status = 200, description = "Ok"),
+(status = 401, description = "Unauthorized", body = ErrorResponse),
+),
+)]
+pub async fn delete_ca_x509(
+    principal: Principal,
+    Path(id): Path<String>,
+) -> Result<(), ErrorResponse> {
+    principal.is_admin()?;
+    let id = Uuid::from_str(&id)?;
+    CaCertX509Entity::delete_by_id(&id).await?;
+    Ok(())
 }

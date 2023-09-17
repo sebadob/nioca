@@ -61,7 +61,7 @@ impl CaCertX509Entity {
     }
 
     pub async fn find_default(typ: CaCertX509Type) -> Result<Self, ErrorResponse> {
-        query_as!(
+        let slf = query_as!(
             Self,
             r#"SELECT * FROM ca_certs_x509
             WHERE typ = $1
@@ -69,21 +69,28 @@ impl CaCertX509Entity {
             typ.as_str(),
         )
         .fetch_one(Db::conn())
-        .await
-        .map_err(ErrorResponse::from)
+        .await?;
+        Ok(slf)
     }
 
     #[allow(dead_code)]
     pub async fn find_by_id(id: &Uuid, typ: CaCertX509Type) -> Result<Self, ErrorResponse> {
-        query_as!(
+        let slf = query_as!(
             Self,
             "SELECT * FROM ca_certs_x509 WHERE id = $1 AND typ = $2",
             id,
             typ.as_str(),
         )
         .fetch_one(Db::conn())
-        .await
-        .map_err(ErrorResponse::from)
+        .await?;
+        Ok(slf)
+    }
+
+    pub async fn delete_by_id(id: &Uuid) -> Result<(), ErrorResponse> {
+        query!("DELETE FROM ca_certs_x509 WHERE id = $1", id)
+            .execute(Db::conn())
+            .await?;
+        Ok(())
     }
 }
 
