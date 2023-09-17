@@ -88,7 +88,7 @@ export async function fetchDeleteCAX509(id) {
 	});
 }
 
-export async function fetchGenerateCASshRoot(data) {
+export async function fetchPostGenerateCASsh(data) {
 	return await fetch('/api/ca/ssh/generate', {
 		method: 'POST',
 		headers: HEADERS_XSRF,
@@ -96,7 +96,7 @@ export async function fetchGenerateCASshRoot(data) {
 	});
 }
 
-export async function fetchExternalCASshRoot(data) {
+export async function fetchPostExternalCASsh(data) {
 	return await fetch('/api/ca/ssh/external', {
 		method: 'POST',
 		headers: HEADERS_XSRF,

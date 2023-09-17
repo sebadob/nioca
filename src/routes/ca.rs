@@ -61,22 +61,24 @@ pub async fn post_generate_ca_ssh(
     payload.validate()?;
 
     let enc_key = state.read().await.enc_keys.enc_key.clone();
-    let group = GroupEntity::find_by_name("default").await?;
 
-    // make sure we do not have a root CA yet
-    if let Ok(entity) = CaCertSshEntity::find_by_group(&group.id).await {
-        return Err(ErrorResponse::new(
-            ErrorResponseType::BadRequest,
-            format!("SSH default CA already exists with id {}", entity.id),
-        ));
-    }
+    let ca_name = if let Some(name) = payload.name {
+        name
+    } else {
+        let name = "default".to_string();
+        let group = GroupEntity::find_by_name(&name).await?;
 
-    let entity = CaCertSshEntity::generate_new(
-        payload.name.unwrap_or_else(|| "default".to_string()),
-        payload.alg,
-        &enc_key,
-    )
-    .await?;
+        // make sure we do not have a root CA yet
+        if let Ok(entity) = CaCertSshEntity::find_by_group(&group.id).await {
+            return Err(ErrorResponse::new(
+                ErrorResponseType::BadRequest,
+                format!("SSH default CA already exists with id {}", entity.id),
+            ));
+        }
+        name
+    };
+
+    let entity = CaCertSshEntity::generate_new(ca_name, payload.alg, &enc_key).await?;
     let resp = CaCertSshResponse::from(entity);
     Ok(Json(resp))
 }
@@ -105,22 +107,24 @@ pub async fn post_external_ca_ssh(
 
     // key is valid - create a new entity
     let enc_key = state.read().await.enc_keys.enc_key.clone();
-    let group = GroupEntity::find_by_name("default").await?;
 
-    // make sure we do not have a root CA yet
-    if let Ok(entity) = CaCertSshEntity::find_by_group(&group.id).await {
-        return Err(ErrorResponse::new(
-            ErrorResponseType::BadRequest,
-            format!("SSH default CA already exists with id {}", entity.id),
-        ));
-    }
+    let ca_name = if let Some(name) = payload.name {
+        name
+    } else {
+        let name = "default".to_string();
+        let group = GroupEntity::find_by_name("default").await?;
 
-    let entity = CaCertSshEntity::insert(
-        payload.name.unwrap_or_else(|| "default".to_string()),
-        kp,
-        &enc_key,
-    )
-    .await?;
+        // make sure we do not have a root CA yet
+        if let Ok(entity) = CaCertSshEntity::find_by_group(&group.id).await {
+            return Err(ErrorResponse::new(
+                ErrorResponseType::BadRequest,
+                format!("SSH default CA already exists with id {}", entity.id),
+            ));
+        }
+        name
+    };
+
+    let entity = CaCertSshEntity::insert(ca_name, kp, &enc_key).await?;
     let resp = CaCertSshResponse::from(entity);
     Ok(Json(resp))
 }

@@ -1,5 +1,5 @@
 <script>
-    import {fetchExternalCASshRoot, fetchGenerateCASshRoot} from "../../../utils/dataFetching.js";
+    import {fetchPostExternalCASsh, fetchPostGenerateCASsh} from "../../../utils/dataFetching.js";
     import Button from "$lib/Button.svelte";
     import {scale} from 'svelte/transition';
     import OptionSelect from "$lib/OptionSelect.svelte";
@@ -8,7 +8,7 @@
     import {REGEX_KEY_HEX, SSH_CERT_AGLS} from "../../../utils/constants.js";
     import {extractFormErrors} from "../../../utils/helpers.js";
 
-    const btnWidth = 150;
+    const btnWidth = '9rem';
 
     export let cas;
 
@@ -34,7 +34,7 @@
 
         isLoading = true;
 
-        let res = await fetchGenerateCASshRoot(data);
+        let res = await fetchPostGenerateCASsh(data);
         let body = await res.json();
         if (res.ok) {
             cas = {
@@ -66,7 +66,7 @@
         };
         console.log(data);
 
-        let res = await fetchExternalCASshRoot(data);
+        let res = await fetchPostExternalCASsh(data);
         let body = await res.json();
         if (res.ok) {
             cas = {
@@ -134,14 +134,14 @@
                 </div>
 
                 <div class="formRow" style="width: 480px;">
-          <textarea
-                  name="keyEncHex"
-                  class="font-mono"
-                  placeholder="Encrypted private Key in HEX format"
-                  rows={15}
-                  cols={20}
-                  bind:value={formValues.keyEncHex}
-          ></textarea>
+                    <textarea
+                            name="keyEncHex"
+                            class="font-mono"
+                            placeholder="Encrypted private Key in HEX format"
+                            rows={15}
+                            cols={20}
+                            bind:value={formValues.keyEncHex}
+                    ></textarea>
                 </div>
 
                 {#if formErrors.keyEncHex}
@@ -167,9 +167,9 @@
                     </div>
 
                     {#if formErrors.keyPassword}
-            <span class="err">
-              {formErrors.keyPassword}
-            </span>
+                        <span class="err">
+                          {formErrors.keyPassword}
+                        </span>
                     {/if}
                 </div>
             </div>
