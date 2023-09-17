@@ -115,13 +115,6 @@ pub async fn init(
     .await?;
 
     query!(
-        "INSERT INTO master_key (id, value) VALUES ('default_x509', $1)",
-        uuid.to_string(),
-    )
-    .execute(&mut *txn)
-    .await?;
-
-    query!(
         "INSERT INTO enc_keys (id, alg, value) VALUES ($1, $2, $3)",
         enc_key_id,
         enc_key_alg.to_string(),
