@@ -11,13 +11,12 @@
     };
 
     let err = '';
-    let expandContainer;
+    let show;
     let confirmDelete = false;
 
-    $: usedInGroups = groups.filter(g => g.caX509 === ca.intermediate.id).map(g => g.name);
+    $: usedInGroups = groups.filter(g => g.caX509 === ca.intermediate.id).map(g => g.name).join(', ');
 
     async function deleteCA() {
-        console.log('deleting CA');
         let res = await fetchDeleteCAX509(ca.intermediate.id);
         if (res.ok) {
             onSave();
@@ -29,7 +28,7 @@
 
 </script>
 
-<ExpandContainer bind:show={expandContainer}>
+<ExpandContainer bind:show>
     <div class="header" slot="header">
         <div class="data font-mono">
             {ca.root.id}

@@ -104,6 +104,13 @@ export async function fetchExternalCASshRoot(data) {
 	});
 }
 
+export async function fetchDeleteCAXSsh(id) {
+	return await fetch(`/api/ca/ssh/${id}`, {
+		method: 'DELETE',
+		headers: HEADERS_XSRF,
+	});
+}
+
 export async function fetchGetClientsSsh() {
 	return await fetch('/api/clients/ssh', {
 		method: 'GET',
