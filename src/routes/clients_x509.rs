@@ -4,6 +4,7 @@ use crate::models::api::error_response::ErrorResponse;
 use crate::models::api::principal::Principal;
 use crate::models::api::request::ClientX509Request;
 use crate::models::api::response::{CertX509Response, ClientSecretResponse, ClientX509Response};
+use crate::models::db::ca_cert_x509::CaCertX509Full;
 use crate::models::db::client_x509::{ClientX509Entity, ClientX509EntityCert};
 use crate::routes::AppStateExtract;
 use axum::extract::Path;
@@ -157,10 +158,13 @@ pub async fn post_build_client_cert(
     let uuid = Uuid::from_str(&id)?;
     let client = ClientX509Entity::find(&uuid).await?;
 
-    client
+    let ca_id = client
         .validate_active_enabled(state.clone(), api_key.token())
         .await?;
-    let resp = match client.build_cert(state, CertFormat::Pem, None).await? {
+    let enc_keys = state.read().await.enc_keys.clone();
+    let ca = CaCertX509Full::build_by_id(&ca_id, &enc_keys).await?;
+    let resp = match client.build_cert(&ca, CertFormat::Pem, None).await? {
+        // let resp = match client.build_cert(state, CertFormat::Pem, None).await? {
         ClientX509EntityCert::Pem(resp) => resp,
         _ => unreachable!(),
     };
@@ -188,11 +192,13 @@ pub async fn post_build_client_cert_p12(
     let uuid = Uuid::from_str(&id)?;
     let client = ClientX509Entity::find(&uuid).await?;
 
-    client
+    let ca_id = client
         .validate_active_enabled(state.clone(), api_key.token())
         .await?;
+    let enc_keys = state.read().await.enc_keys.clone();
+    let ca = CaCertX509Full::build_by_id(&ca_id, &enc_keys).await?;
     let pkcs12 = match client
-        .build_cert(state, CertFormat::PKCS12, Some(api_key.token()))
+        .build_cert(&ca, CertFormat::PKCS12, Some(api_key.token()))
         .await?
     {
         ClientX509EntityCert::PKCS12(pkcs12) => pkcs12,
