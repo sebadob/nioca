@@ -260,6 +260,7 @@ pub struct CaCertX509Nioca {
 }
 
 impl CaCertX509Nioca {
+    #[allow(clippy::too_many_arguments)]
     pub async fn add_new(
         enc_keys: &EncKeys,
         id: Uuid,
