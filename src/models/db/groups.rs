@@ -69,16 +69,16 @@ impl GroupEntity {
         Ok(())
     }
 
-    pub async fn update(req: GroupUpdateRequest) -> Result<(), ErrorResponse> {
-        // the AND name != 'default' is necessary to never change the name of the default groups, which would break
-        // some logic
+    pub async fn update(id: &Uuid, req: GroupUpdateRequest) -> Result<(), ErrorResponse> {
+        // TODO make it impossible to change the 'default' name without fetching the information beforehand
+        // -> create more sophisticated query
         query!(
-            "UPDATE groups SET name = $1, enabled = $2, ca_ssh = $3, ca_x509 = $4 WHERE id = $5 AND name != 'default'",
+            "UPDATE groups SET name = $1, enabled = $2, ca_ssh = $3, ca_x509 = $4 WHERE id = $5",
             req.name,
             req.enabled,
             req.ca_ssh,
             req.ca_x509,
-            req.id,
+            id,
         )
         .execute(Db::conn())
         .await?;

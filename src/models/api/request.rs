@@ -108,7 +108,6 @@ pub struct GroupCreateRequest {
 #[derive(Debug, Deserialize, ToSchema, Validate)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupUpdateRequest {
-    pub id: Uuid,
     #[validate(regex(path = "RE_CA_NAME", code = "[a-zA-Z0-9\\-_.\\s]+"))]
     pub name: String,
     pub enabled: bool,

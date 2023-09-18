@@ -62,12 +62,14 @@ responses(
 )]
 pub async fn put_group(
     principal: Principal,
+    Path(id): Path<String>,
     Json(payload): Json<GroupUpdateRequest>,
 ) -> Result<(), ErrorResponse> {
     principal.is_admin()?;
     payload.validate()?;
 
-    GroupEntity::update(payload).await?;
+    let id = Uuid::from_str(&id)?;
+    GroupEntity::update(&id, payload).await?;
     Ok(())
 }
 

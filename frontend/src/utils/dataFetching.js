@@ -221,6 +221,15 @@ export async function fetchGetGroups() {
 	});
 }
 
+export async function fetchPostGroup(data) {
+	return await fetch('/api/groups', {
+		method: 'POST',
+		headers: HEADERS_XSRF,
+		body: JSON.stringify(data),
+	});
+}
+
+
 export async function fetchPutGroups(id, data) {
 	return await fetch(`/api/groups/${id}`, {
 		method: 'PUT',

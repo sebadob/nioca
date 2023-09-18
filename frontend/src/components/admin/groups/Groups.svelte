@@ -3,6 +3,7 @@
     import OrderSearchBar from "$lib/search/OrderSearchBar.svelte";
     import {fetchGetCAsSsh, fetchGetCAsX509, fetchGetGroups} from "../../../utils/dataFetching.js";
     import GroupTile from "./GroupTile.svelte";
+    import GroupsTileAddNew from "./GroupsTileAddNew.svelte";
 
     let msg = '';
     let groups = [];
@@ -31,7 +32,7 @@
         },
     ];
 
-    onMount(async () => {
+    onMount(() => {
         fetchCAsSsh();
         fetchCAsX509();
         fetchGroups();
@@ -92,7 +93,7 @@
             orderOptions={orderOptions}
     />
 
-    <!--    <ClientTileAddNew bind:groups bind:casSsh onSave={onSave}/>-->
+    <GroupsTileAddNew bind:casSsh bind:casX509 onSave={onSave}/>
 
     {#each resGroups as group}
         <GroupTile bind:group bind:casSsh bind:casX509 onSave={onSave}/>
