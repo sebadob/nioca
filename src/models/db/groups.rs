@@ -1,6 +1,6 @@
 use crate::config::Db;
 use crate::models::api::error_response::ErrorResponse;
-use crate::models::api::request::GroupUpdateRequest;
+use crate::models::api::request::{GroupCreateRequest, GroupUpdateRequest};
 use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as};
 use uuid::Uuid;
@@ -48,14 +48,37 @@ impl GroupEntity {
         Ok(res)
     }
 
-    pub async fn update(req: GroupUpdateRequest) -> Result<(), ErrorResponse> {
+    pub async fn insert(req: GroupCreateRequest) -> Result<(), ErrorResponse> {
+        query!(
+            r#"INSERT INTO groups (id, name, enabled, ca_ssh, ca_x509, ca_x509_typ)
+            VALUES ($1, $2, true, $3, $4, 'certificate')"#,
+            Uuid::new_v4(),
+            req.name,
+            req.ca_ssh,
+            req.ca_x509,
+        )
+        .execute(Db::conn())
+        .await?;
+        Ok(())
+    }
+
+    pub async fn delete(id: &Uuid) -> Result<(), ErrorResponse> {
+        query!("DELETE FROM groups WHERE id = $1", id,)
+            .execute(Db::conn())
+            .await?;
+        Ok(())
+    }
+
+    pub async fn update(id: &Uuid, req: GroupUpdateRequest) -> Result<(), ErrorResponse> {
+        // TODO make it impossible to change the 'default' name without fetching the information beforehand
+        // -> create more sophisticated query
         query!(
             "UPDATE groups SET name = $1, enabled = $2, ca_ssh = $3, ca_x509 = $4 WHERE id = $5",
             req.name,
             req.enabled,
             req.ca_ssh,
             req.ca_x509,
-            req.id,
+            id,
         )
         .execute(Db::conn())
         .await?;

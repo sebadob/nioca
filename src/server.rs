@@ -286,8 +286,11 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                     "/clients/x509/:id/secret",
                     get(clients_x509::get_client_secret).put(clients_x509::put_client_secret),
                 )
-                .route("/groups", get(groups::get_groups))
-                .route("/groups/:id", put(groups::put_group))
+                .route("/groups", get(groups::get_groups).post(groups::post_group))
+                .route(
+                    "/groups/:id",
+                    put(groups::put_group).delete(groups::delete_group),
+                )
                 .route("/login", post(unsealed::post_login))
                 .route("/login/check", get(unsealed::get_login_check))
                 .route("/logout", post(unsealed::post_logout))

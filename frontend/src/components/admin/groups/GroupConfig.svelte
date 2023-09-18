@@ -15,7 +15,6 @@
     export let onSave;
 
     let width = '23rem';
-    let isLoading = false;
     let err = '';
     let success = false;
     let timer;
@@ -91,7 +90,6 @@
 
     async function onSubmit() {
         err = '';
-        isLoading = true;
 
         const valid = await validateForm();
         if (!valid) {
@@ -114,8 +112,6 @@
             let body = await res.json();
             err = body.message;
         }
-
-        isLoading = false;
     }
 
     async function validateForm() {
@@ -144,7 +140,7 @@
 <!-- Group Name -->
 <div class="data">
     <Input
-            name="clientName"
+            name="name"
             bind:value={group.name}
             bind:error={formErrors.name}
             placeholder="Group Name"

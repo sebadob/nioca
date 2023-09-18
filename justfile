@@ -33,7 +33,9 @@ clippy:
 # runs the application
 run:
     #!/usr/bin/env bash
+    set -euxo pipefail
     clear
+
     #cargo run --target x86_64-unknown-linux-musl
     DATABASE_URL={{db_url}} cargo build
     sudo setcap CAP_NET_BIND_SERVICE=+eip $(pwd)/target/debug/nioca
@@ -171,3 +173,5 @@ publish: build-image
 
     docker tag sdobedev/nioca:$TAG sdobedev/nioca:latest
     docker push sdobedev/nioca:latest
+    docker tag sdobedev/nioca:latest ghcr.io/sebadob/nioca:latest
+    docker push ghcr.io/sebadob/nioca:latest
