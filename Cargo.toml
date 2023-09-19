@@ -1,6 +1,6 @@
 [package]
 name = "nioca"
-version = "0.4.0-20230917"
+version = "0.4.0-20230919"
 edition = "2021"
 authors = ["Sebastian Dobe <sebastiandobe@mailbox.org>"]
 license = "AGPLv3"
