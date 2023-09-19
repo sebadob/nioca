@@ -35,7 +35,7 @@
 
         {#if err}
             <div class="err">
-                {err}
+                {@html err}
             </div>
         {/if}
     </div>
@@ -53,8 +53,6 @@
     }
 
     .err {
-        display: flex;
-        align-items: center;
         margin: 0 10px;
         color: var(--col-err);
     }
