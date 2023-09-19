@@ -1,11 +1,14 @@
-use crate::models::api::error_response::ErrorResponse;
+use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::principal::Principal;
 use crate::models::api::request::{GroupCreateRequest, GroupUpdateRequest};
 use crate::models::api::response::GroupResponse;
+use crate::models::db::client_ssh::ClientSshEntity;
+use crate::models::db::client_x509::ClientX509Entity;
 use crate::models::db::groups::GroupEntity;
 use axum::extract::Path;
 use axum::Json;
 use std::str::FromStr;
+use tracing::{error, warn};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -90,6 +93,35 @@ pub async fn delete_group(
     principal.is_admin()?;
 
     let id = Uuid::from_str(&id)?;
-    GroupEntity::delete(&id).await?;
+    if let Err(err) = GroupEntity::delete(&id).await {
+        return if err.message.contains("foreign key") {
+            // if we violate a foreign key constraint, it means that the group is still in use
+            // for a better UX, provide the linked clients to the user
+            warn!("Cannot delete group in use: {}", id);
+
+            let clients_ssh = ClientSshEntity::find_with_group(&id).await?;
+            let clients_x509 = ClientX509Entity::find_with_group(&id).await?;
+
+            // TODO may be removed after enough testing
+            if clients_ssh.is_empty() && clients_x509.is_empty() {
+                error!("foreign key constraint violation when deleting group but no linked clients found");
+            }
+
+            let msg_ssh = clients_ssh.join("<br/>");
+            let msg_x509 = clients_x509.join("<br/>");
+            let err_msg = format!(
+                r#"<p><b>Cannot delete group which is still in use</b></p>
+                <p>SSH Clients:<br/>{}</p>
+                <p>X509 Clients:<br/>{}</p>"#,
+                msg_ssh, msg_x509
+            );
+
+            Err(ErrorResponse::new(ErrorResponseType::BadRequest, err_msg))
+        } else {
+            error!("{:?}", err);
+            Err(err)
+        };
+    }
+
     Ok(())
 }
