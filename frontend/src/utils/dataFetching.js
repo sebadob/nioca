@@ -238,6 +238,13 @@ export async function fetchPutGroups(id, data) {
 	});
 }
 
+export async function fetchDeleteGroup(id) {
+	return await fetch(`/api/groups/${id}`, {
+		method: 'DELETE',
+		headers: HEADERS_XSRF,
+	});
+}
+
 export async function fetchGetOidcExists() {
 	return await fetch('/api/oidc/exists', {
 		method: 'GET',

@@ -1,38 +1,36 @@
 <script>
     import Button from "$lib/Button.svelte";
-    import {fetchDeleteClientX509} from "../../../utils/dataFetching.js";
+    import {fetchDeleteClientSsh, fetchDeleteGroup} from "../../../utils/dataFetching.js";
 
-    export let client = {};
+    export let group = {};
     export let onSave;
 
-    let isLoading = false;
+    // let isLoading = false;
     let err = '';
-    let success = false;
+
+    // let success = false;
 
     async function onSubmit() {
         err = '';
-        isLoading = true;
 
-        let res = await fetchDeleteClientX509(client.id);
+        let res = await fetchDeleteGroup(group.id);
         if (res.ok) {
             onSave();
         } else {
             let body = await res.json();
             err = body.message;
         }
-
-        isLoading = false;
     }
 
 </script>
 
 <div class="data">
     <div class="label">
-        Are you sure, you want to delete this client?
+        Are you sure, you want to delete this group?
     </div>
     <div class="value">
         <div class="btn">
-            <Button on:click={onSubmit} bind:isLoading>DELETE</Button>
+            <Button on:click={onSubmit}>DELETE</Button>
         </div>
 
         {#if err}
@@ -51,7 +49,6 @@
     .data {
         display: flex;
         flex-direction: column;
-        /*align-items: center;*/
         margin: 3px 10px;
     }
 
@@ -64,13 +61,15 @@
 
     .label {
         height: 30px;
-        margin: 0 7px;
+        margin: 0 5px;
         display: flex;
-        align-items: center;
         font-weight: bold;
     }
 
     .value {
-        margin: 15px 0 25px 0;
+        margin: 5px 0 25px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 </style>

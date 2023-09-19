@@ -95,7 +95,7 @@
 
     <GroupsTileAddNew bind:casSsh bind:casX509 onSave={onSave}/>
 
-    {#each resGroups as group}
+    {#each resGroups as group (group.id)}
         <GroupTile bind:group bind:casSsh bind:casX509 onSave={onSave}/>
     {/each}
 

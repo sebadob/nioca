@@ -44,8 +44,8 @@
 </div>
 
 <style>
-    .btm {
-        width: 7rem;
+    .btn {
+        width: 5rem;
     }
 
     .data {
