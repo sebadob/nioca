@@ -168,6 +168,16 @@ impl ClientSshEntity {
         slf.decrypt_api_key(enc_keys).await
     }
 
+    pub async fn find_with_group(group_id: &Uuid) -> Result<Vec<String>, ErrorResponse> {
+        let res = query!("SELECT id FROM clients_ssh WHERE group_id = $1", group_id)
+            .fetch_all(Db::conn())
+            .await?
+            .into_iter()
+            .map(|rec| rec.id.to_string())
+            .collect();
+        Ok(res)
+    }
+
     pub async fn decrypt_api_key(&self, enc_keys: &EncKeys) -> Result<String, ErrorResponse> {
         // If the enc_key is not the currently active one, fetch the old one and re-encrypt with the
         // active key

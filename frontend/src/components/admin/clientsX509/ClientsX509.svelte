@@ -66,7 +66,7 @@
 
     <ClientTileAddNew bind:groups onSave={onSave}/>
 
-    {#each resClients as client}
+    {#each resClients as client (client.id)}
         <ClientTile bind:groups bind:client onSave={onSave}/>
     {/each}
 
