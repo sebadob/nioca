@@ -145,10 +145,6 @@
 {/if}
 
 <style>
-    .btm {
-        width: 8rem;
-    }
-
     .certBlock {
         margin: 5px 0;
         display: flex;

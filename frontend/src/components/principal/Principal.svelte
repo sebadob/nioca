@@ -1,76 +1,78 @@
 <script>
-  import CheckIcon from "$lib/CheckIcon.svelte";
-	import IconLogout from "../icons/IconLogout.svelte";
-  import Tooltip from "$lib/Tooltip.svelte";
-	import { fetchLogout } from "../../utils/dataFetching.js";
-	import { deleteXsrfToken } from "../../utils/helpers.js";
+    import CheckIcon from "$lib/CheckIcon.svelte";
+    import IconLogout from "../icons/IconLogout.svelte";
+    import Tooltip from "$lib/Tooltip.svelte";
+    import {fetchLogout} from "../../utils/dataFetching.js";
+    import {deleteXsrfToken} from "../../utils/helpers.js";
 
-	export let principal;
+    export let principal;
 
-	let color = 'var(--col-text)';
+    let color = 'var(--col-text)';
 
-	function onHoverEnter() {
-		color = 'var(--col-acnt)';
-  }
+    function onHoverEnter() {
+        color = 'var(--col-acnt)';
+    }
 
-	function onHoverLeave() {
-		color = 'var(--col-text)';
-	}
+    function onHoverLeave() {
+        color = 'var(--col-text)';
+    }
 
-	async function logout() {
-    await fetchLogout();
-    deleteXsrfToken();
-    window.location.reload();
-  }
+    async function logout() {
+        await fetchLogout();
+        deleteXsrfToken();
+        window.location.reload();
+    }
 
 </script>
 
 <div class="container">
-  <div class="head">
-    {principal.email || 'root'}
-  </div>
+    <div class="head">
+        {principal.email || 'root'}
+    </div>
 
-  <div class="row">
-    <div class="label">
-      Admin
+    <div class="row">
+        <div class="label">
+            Admin
+        </div>
+        <div class="value">
+            <CheckIcon check={principal.isAdmin}/>
+        </div>
     </div>
-    <div class="value">
-      <CheckIcon check={principal.isAdmin}/>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="label">
-      User
+    <div class="row">
+        <div class="label">
+            User
+        </div>
+        <div class="value">
+            <CheckIcon check={principal.isUser}/>
+        </div>
     </div>
-    <div class="value">
-      <CheckIcon check={principal.isUser}/>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="label">
-      Federated
+    <div class="row">
+        <div class="label">
+            Federated
+        </div>
+        <div class="value">
+            <CheckIcon check={!principal.local}/>
+        </div>
     </div>
-    <div class="value">
-      <CheckIcon check={!principal.local}/>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="value"></div>
-    <Tooltip text="Logout" xOffset={-80}>
-      <div
-          class="logout"
-          on:mouseenter={onHoverEnter}
-          on:mouseleave={onHoverLeave}
-          on:click={logout}
-          on:keypress={logout}
-      >
-        <IconLogout color={color} />
-      </div>
-    </Tooltip>
-  </div>
+    <div class="row">
+        <div class="value"></div>
+        <Tooltip text="Logout" xOffset={-80}>
+            <div
+                    role="button"
+                    tabindex="0"
+                    class="logout"
+                    on:mouseenter={onHoverEnter}
+                    on:mouseleave={onHoverLeave}
+                    on:click={logout}
+                    on:keypress={logout}
+            >
+                <IconLogout color={color}/>
+            </div>
+        </Tooltip>
+    </div>
 
 </div>
 

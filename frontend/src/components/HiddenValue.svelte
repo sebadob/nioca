@@ -55,11 +55,11 @@
     {text}
   </div>
 
-  <div class="btn" on:click={copy} on:keypress={copy}>
+  <div role="button" tabindex="0" class="btn" on:click={copy} on:keypress={copy}>
     <IconClipboard/>
   </div>
 
-  <div class="btn" on:click={toggle} on:keypress={toggle}>
+  <div role="button" tabindex="0" class="btn" on:click={toggle} on:keypress={toggle}>
     {#if showValue}
       <IconEye width={22}/>
     {:else}

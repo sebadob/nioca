@@ -197,6 +197,8 @@
                     <div class="flexRow">
                         {uuid}
                         <div
+                                role="button"
+                                tabindex="0"
                                 class="btn"
                                 on:click={copy}
                                 on:keypress={copy}

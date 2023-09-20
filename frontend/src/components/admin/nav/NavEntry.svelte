@@ -29,6 +29,8 @@
 </script>
 
 <div
+        role="link"
+        tabindex="0"
         class="entry noselect"
         class:selected={selected === label}
         on:click={() => selected = label}

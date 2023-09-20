@@ -149,13 +149,13 @@ is-clean: test build
     echo all good
 
 
-## sets a new git tag and pushes it
-#release:
-#    #!/usr/bin/env bash
-#    set -euxo pipefail
-#
-#    git tag "v$TAG"
-#    git push origin "v$TAG"
+# sets a new git tag and pushes it
+release:
+    #!/usr/bin/env bash
+    set -euxo pipefail
+
+    git tag "v$TAG"
+    git push origin "v$TAG"
 
 
 # publishes the application images
@@ -169,7 +169,9 @@ publish-nightly: build-image
 # publishes the application images
 publish: build-image
     docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
-    #docker push sdobedev/nioca:$TAG
+    docker push sdobedev/nioca:$TAG
+    docker tag sdobedev/nioca:$TAG ghcr.io/sebadob/nioca:$TAG
+    docker push ghcr.io/sebadob/nioca:$TAG
 
     docker tag sdobedev/nioca:$TAG sdobedev/nioca:latest
     docker push sdobedev/nioca:latest
