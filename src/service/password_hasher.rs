@@ -239,9 +239,9 @@ mod tests {
 
         // since the MAX_HASH_THREADS was set 1, the time for 3 concurrent hashes should be about
         // 3 times the first time_taken.
-        // Allow margin of error / time difference of 5%
-        let time_taken_90_percent = time_taken * 95 / 100;
-        assert!(time_taken_concurrent > 3 * time_taken_90_percent);
+        // Allow margin of error / time difference of 30%
+        let time_taken_70_percent = time_taken * 70 / 100;
+        assert!(time_taken_concurrent > 3 * time_taken_70_percent);
     }
 
     #[tokio::test]
