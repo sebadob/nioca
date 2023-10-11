@@ -72,14 +72,14 @@ test:
     set -euxo pipefail
     clear
 
-    DATABASE_URL={{db_url}} cargo build
-    DATABASE_URL={{db_url}} cargo run test &
-    sleep 1
-    PID=$(echo "$!")
-    echo "PID: $PID"
+    #DATABASE_URL={{db_url}} cargo build
+    #DATABASE_URL={{db_url}} cargo run &
+    #sleep 1
+    #PID=$(echo "$!")
+    #echo "PID: $PID"
 
     DATABASE_URL={{db_url}} cargo test
-    kill "$PID"
+    #kill "$PID"
     echo All tests successful
 
 
@@ -167,7 +167,7 @@ publish-nightly: build-image
 
 
 # publishes the application images
-publish: build-image
+publish: is-clean build-image
     docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
     docker push sdobedev/nioca:$TAG
     docker tag sdobedev/nioca:$TAG ghcr.io/sebadob/nioca:$TAG
