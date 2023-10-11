@@ -107,9 +107,9 @@ impl From<reqwest::Error> for ErrorResponse {
     fn from(err: reqwest::Error) -> Self {
         let typ = if let Some(status) = err.status() {
             match status.as_u16() {
-                x if x == 400 => ErrorResponseType::BadRequest,
-                x if x == 401 => ErrorResponseType::Unauthorized,
-                x if x == 404 => ErrorResponseType::NotFound,
+                400 => ErrorResponseType::BadRequest,
+                401 => ErrorResponseType::Unauthorized,
+                404 => ErrorResponseType::NotFound,
                 _ => ErrorResponseType::Internal,
             }
         } else {
