@@ -124,18 +124,18 @@ build: build-ui
     # manually update the cross image: docker pull ghcr.io/cross-rs/x86_64-unknown-linux-musl:main
     which cross || echo "'cross' needs to be installed: cargo install cross --git https://github.com/cross-rs/cross"
 
-    cross build --release --target x86_64-unknown-linux-musl || echo 'if the sqlx query! macro fails: cargo sqlx prepare'
+    cross build --release --target x86_64-unknown-linux-musl || echo 'if the sqlx query! macro fails: just prepare'
     cp target/x86_64-unknown-linux-musl/release/nioca out/
 
 
-build-image: build
+build-image: test build
     #!/usr/bin/env bash
     set -euxo pipefail
     docker build --no-cache -t sdobedev/nioca:$TAG .
 
 
 # makes sure everything is fine
-is-clean: test build
+is-clean:
     #!/usr/bin/env bash
     set -euxo pipefail
     clear
@@ -150,7 +150,7 @@ is-clean: test build
 
 
 # sets a new git tag and pushes it
-release:
+release: is-clean
     #!/usr/bin/env bash
     set -euxo pipefail
 
@@ -167,7 +167,7 @@ publish-nightly: build-image
 
 
 # publishes the application images
-publish: is-clean build-image
+publish: build-image
     docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
     docker push sdobedev/nioca:$TAG
     docker tag sdobedev/nioca:$TAG ghcr.io/sebadob/nioca:$TAG
