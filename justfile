@@ -18,7 +18,7 @@ migrate:
 
 
 # runs `cargo sqlx prepare` against the correct database
-prepare:
+prepare: migrate
     DATABASE_URL={{db_url}} cargo sqlx prepare
 
 
@@ -124,14 +124,26 @@ build: build-ui
     # manually update the cross image: docker pull ghcr.io/cross-rs/x86_64-unknown-linux-musl:main
     which cross || echo "'cross' needs to be installed: cargo install cross --git https://github.com/cross-rs/cross"
 
-    cross build --release --target x86_64-unknown-linux-musl || echo 'if the sqlx query! macro fails: just prepare'
-    cp target/x86_64-unknown-linux-musl/release/nioca out/
+    cargo clean
+    cross build --release --target x86_64-unknown-linux-musl
+    cp target/x86_64-unknown-linux-musl/release/nioca out/nioca-amd64
+
+    cargo clean
+    cross build --release --target aarch64-unknown-linux-musl
+    cp target/aarch64-unknown-linux-musl/release/nioca out/nioca-arm64
 
 
-build-image: test build
+#build-image: test build
+build-image:
     #!/usr/bin/env bash
     set -euxo pipefail
-    docker build --no-cache -t sdobedev/nioca:$TAG .
+
+    docker buildx build \
+              -t ghcr.io/sebadob/nioca:$TAG \
+               --platform linux/amd64,linux/arm64 \
+               --no-cache \
+               --push \
+               .
 
 
 # makes sure everything is fine
@@ -159,21 +171,7 @@ release: is-clean
 
 
 # publishes the application images
-publish-nightly: build-image
-    docker build --no-cache -f Dockerfile -t sdobedev/nioca:nightly .
-    docker push sdobedev/nioca:nightly
-    docker tag sdobedev/nioca:nightly ghcr.io/sebadob/nioca:nightly
-    docker push ghcr.io/sebadob/nioca:nightly
-
-
-# publishes the application images
 publish: build-image
-    docker build --no-cache -f Dockerfile -t sdobedev/nioca:$TAG .
-    docker push sdobedev/nioca:$TAG
-    docker tag sdobedev/nioca:$TAG ghcr.io/sebadob/nioca:$TAG
-    docker push ghcr.io/sebadob/nioca:$TAG
-
-    docker tag sdobedev/nioca:$TAG sdobedev/nioca:latest
-    docker push sdobedev/nioca:latest
-    docker tag sdobedev/nioca:latest ghcr.io/sebadob/nioca:latest
+    docker pull ghcr.io/sebadob/nioca:$TAG
+    docker tag ghcr.io/sebadob/nioca:$TAG ghcr.io/sebadob/nioca:latest
     docker push ghcr.io/sebadob/nioca:latest

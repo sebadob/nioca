@@ -1,34 +1,27 @@
-#FROM rust-builder-musl as builder
-#
-#WORKDIR /work
-#
-#COPY Cargo.toml .
-#COPY Cargo.lock .
-#COPY src ./src/
-#COPY build.rs .
-#COPY static ./static/
-#COPY migrations ./migrations/
-#COPY sqlx-data.json ./sqlx-data.json
-#
-##RUN cargo build --target x86_64-unknown-linux-musl --release
-#RUN cargo build --release
+FROM --platform=$BUILDPLATFORM alpine:3.18.4 AS builderBackend
 
-#FROM scratch as app
-FROM alpine:3.13.3 as app
+# docker buildx args automatically available
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
-#RUN apk update && apk add --no-cache ca-certificates tzdata && update-ca-certificates
-#RUN apk update && apk add --no-cache tzdata
+# This step is only for debugging / logging the arch we are building for
+RUN echo "I'm building on $BUILDPLATFORM for $TARGETOS/$TARGETARCH"
 
-#USER 10001
+FROM --platform=$TARGETPLATFORM scratch
 
-#COPY --chown=10001:10001 build/tls/ ./tls/
+# docker buildx args automatically available
+ARG BUILDPLATFORM
+ARG TARGETPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
+
+USER 10001:10001
+
 COPY --chown=10001:10001 static ./static/
-#COPY --chown=10001:10001 --from=builder /work/target/x86_64-unknown-linux-musl/release/nioca ./nioca
-COPY --chown=10001:10001 out/nioca ./nioca
-
-#RUN chown -R 10001:10001 tls static nioca
+COPY --chown=10001:10001 out/nioca-"$TARGETARCH" ./nioca
 
 EXPOSE 8080 8443
 
-ENTRYPOINT ["/nioca"]
-CMD ["server"]
+CMD ["/nioca"]
