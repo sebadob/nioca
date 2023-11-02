@@ -2,3 +2,4 @@
 .idea
 db.sqlite*
 ca
+tls/root.cert.pem
