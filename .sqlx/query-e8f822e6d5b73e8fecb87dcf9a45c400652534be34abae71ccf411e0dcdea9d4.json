@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM ca_certs_x509 WHERE typ = $1 OR typ = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "typ",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "expires",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "data",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "fingerprint",
+        "type_info": "Bytea"
+      },
+      {
+        "ordinal": 6,
+        "name": "enc_key_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "e8f822e6d5b73e8fecb87dcf9a45c400652534be34abae71ccf411e0dcdea9d4"
+}
