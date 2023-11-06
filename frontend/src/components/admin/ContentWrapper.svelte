@@ -11,8 +11,8 @@
 <div
         class="content"
         style="left: {navWidth}; width: calc(100vw - {navWidth})"
-        in:fade|global={{delay: tDur, duration: tDur}}
-        out:fade|global={{duration: tDur}}
+        in:fade={{delay: tDur, duration: tDur}}
+        out:fade={{duration: tDur}}
 >
     <slot></slot>
 </div>
