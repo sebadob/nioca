@@ -15,15 +15,6 @@ pub enum CertType {
     Ssh,
 }
 
-// impl CertType {
-//     pub fn as_str(&self) -> &str {
-//         match self {
-//             Self::X509 => "X509",
-//             Self::Ssh => "SSH",
-//         }
-//     }
-// }
-
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, clap::ValueEnum, ToSchema)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum CertFormat {
@@ -120,26 +111,27 @@ impl SshKeyAlg {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, clap::ValueEnum)]
 #[serde(rename_all = "UPPERCASE")]
+#[allow(clippy::upper_case_acronyms)]
 pub enum X509KeyAlg {
-    Rsa,
-    Ecdsa,
-    Ed25519,
+    RSA,
+    ECDSA,
+    EdDSA,
 }
 
 impl X509KeyAlg {
     pub fn as_str(&self) -> &str {
         match self {
-            X509KeyAlg::Rsa => "RSA",
-            X509KeyAlg::Ecdsa => "ECDSA",
-            X509KeyAlg::Ed25519 => "ED25519",
+            X509KeyAlg::RSA => "RSA",
+            X509KeyAlg::ECDSA => "ECDSA",
+            X509KeyAlg::EdDSA => "EdDSA",
         }
     }
 
     pub fn from_str(s: &str) -> Self {
         match s {
-            "RSA" => Self::Rsa,
-            "ECDSA" => Self::Ecdsa,
-            "ED25519" => Self::Ed25519,
+            "RSA" => Self::RSA,
+            "ECDSA" => Self::ECDSA,
+            "EdDSA" => Self::EdDSA,
             _ => unreachable!(),
         }
     }
