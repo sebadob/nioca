@@ -74,6 +74,4 @@ NOgNNBRl+weZ9xj2+scOJfGdSDvmQhqZWW4CMQCMDVPf8Tr/GFCAKKkmAbjpSxz1
         '97ceb325add6c00ee5c9322c5f8400befd4e82dadac3c9ace041ffe036e3efafcc94bf56d87b77d40fbd0a6c3be03a56a5c05b7a38ac75c106ceb8e7d60645ba659b038779c77de49a8e76080bd1b79cbc1f905bda3dbf81a3ce40e9bfc1c118a9dc0a35550d2399fdf1877354b0066c0845a634ff4dd3382fc18517c3c70d2ff3cb6f1edc62d4276a53877fd1c82859e2d96265ae8bbbc3100dc743ad0aaff308c5a8a25e20f03a3a6136c0b8fdec7bcc7a3d8097935d63595aac6207c4366d0c8b77710705ee0a1562e9e1b41043b2a9500e2cc5fdde68f6bccb570d65932d5518eadffa94018fbbebc353d08ce92717e69d725cce1e460317ba79a40a65b0f95f32f7a39ac4b1da7080b01dba8ff97d5fa2831b823b9a0617c37a0dc3e11359e9db4588ef643959899545810e7f25698d6ef08af4eea5afff91e2b8bd1271f3ff846c8f5b3442360b4d927c1f',
         null, '7aa5066e-39d2-4de7-aeb0-e7a411afa5d9');
 
-insert into nioca.groups (id, name, enabled, ca_ssh, ca_x509, ca_x509_typ)
-values ('8186c600-914d-44ef-8636-e0813e1b9868', 'default', true, null, '4dc0e30d-e845-46a9-8d22-590470990da6',
-        'certificate');
+update nioca.groups set ca_x509 = '4dc0e30d-e845-46a9-8d22-590470990da6', ca_x509_typ = 'certificate' where name = 'default';
