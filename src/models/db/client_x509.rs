@@ -265,15 +265,15 @@ impl ClientX509Entity {
         // let key_pair = gen_ed25519_key_pair()?;
         // params.alg = &rcgen::PKCS_ED25519;
         let key_pair = match X509KeyAlg::from_str(&self.key_alg) {
-            X509KeyAlg::Rsa => {
+            X509KeyAlg::RSA => {
                 params.alg = &rcgen::PKCS_RSA_SHA256;
                 gen_rsa_key_pair(2048)?
             }
-            X509KeyAlg::Ecdsa => {
+            X509KeyAlg::ECDSA => {
                 params.alg = &rcgen::PKCS_ECDSA_P384_SHA384;
                 gen_ecdsa_key_pair()?
             }
-            X509KeyAlg::Ed25519 => {
+            X509KeyAlg::EdDSA => {
                 params.alg = &rcgen::PKCS_ED25519;
                 gen_ed25519_key_pair()?
             }

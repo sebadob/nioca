@@ -5,7 +5,6 @@
 
     let status;
     let err = '';
-    let isLoading = true;
 
     onMount(() => {
         getStatus();
@@ -23,14 +22,8 @@
         } else {
             err = body.msg;
         }
-
-        isLoading = false;
     }
 </script>
-
-{#if isLoading}
-    <Loading/>
-{/if}
 
 {#if err}
     <div style="color: var(--col-err)">

@@ -66,7 +66,7 @@ pub struct X509CliOptions {
     pub state_province_name: Option<String>,
 
     /// The Key algorithm to use
-    #[clap(short = 'a', long = "alg", value_enum, default_value_t = X509KeyAlg::Ecdsa)]
+    #[clap(short = 'a', long = "alg", value_enum, default_value_t = X509KeyAlg::ECDSA)]
     pub key_alg: X509KeyAlg,
 
     /// The key usages to allow for the end entity certificate

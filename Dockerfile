@@ -24,4 +24,6 @@ COPY --chown=10001:10001 out/nioca-"$TARGETARCH" ./nioca
 
 EXPOSE 8080 8443
 
-CMD ["/nioca"]
+ENTRYPOINT ["/nioca"]
+
+CMD ["server"]

@@ -102,7 +102,7 @@
         </div>
 
         {#if localDbLogin}
-            <div transition:slide|global class="localLogin">
+            <div transition:slide class="localLogin">
                 <div class="inputRow">
                     <IconKey width={24}/>
                     <PasswordInput
@@ -119,12 +119,12 @@
                 <Button on:click={loginLocal} width={150} isLoading={isLoading}>LOGIN</Button>
             </div>
         {:else}
-            <div transition:slide|global>
+            <div transition:slide>
                 <Button on:click={showLoginLocal} width={150}>LOCAL LOGIN</Button>
             </div>
 
             {#if oidcConfigured}
-                <div transition:slide|global style="margin-top: 10px;">
+                <div transition:slide style="margin-top: 10px;">
                     <Button on:click={oidcLogin} width={150}>SINGLE SIGN-ON</Button>
                 </div>
             {/if}
