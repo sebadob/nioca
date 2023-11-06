@@ -110,11 +110,6 @@ build-ui:
 #    mdbook build -d ../docs
 
 
-# builds the whole application in release mode
-#build: build-docs build-ui
-#    cargo clippy -- -D warnings
-#    cargo build --release --target x86_64-unknown-linux-musl
-#    cp target/x86_64-unknown-linux-musl/release/nioca out/
 build: build-ui
     #!/usr/bin/env bash
     set -euxo pipefail
@@ -133,8 +128,7 @@ build: build-ui
     cp target/aarch64-unknown-linux-musl/release/nioca out/nioca-arm64
 
 
-#build-image: test build
-build-image:
+build-image: test build
     #!/usr/bin/env bash
     set -euxo pipefail
 
@@ -171,7 +165,7 @@ release: is-clean
 
 
 # publishes the application images
-publish: build-image
+publish: build-docs build-image
     docker pull ghcr.io/sebadob/nioca:$TAG
     docker tag ghcr.io/sebadob/nioca:$TAG ghcr.io/sebadob/nioca:latest
     docker push ghcr.io/sebadob/nioca:latest
