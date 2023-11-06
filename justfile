@@ -128,18 +128,6 @@ build: build-ui
     cp target/aarch64-unknown-linux-musl/release/nioca out/nioca-arm64
 
 
-build-image: test build
-    #!/usr/bin/env bash
-    set -euxo pipefail
-
-    docker buildx build \
-              -t ghcr.io/sebadob/nioca:$TAG \
-               --platform linux/amd64,linux/arm64 \
-               --no-cache \
-               --push \
-               .
-
-
 # makes sure everything is fine
 is-clean:
     #!/usr/bin/env bash
@@ -165,7 +153,20 @@ release: is-clean
 
 
 # publishes the application images
-publish: build-docs build-image
+publish: test build
+     #!/usr/bin/env bash
+     set -euxo pipefail
+
+     docker buildx build \
+       -t ghcr.io/sebadob/nioca:$TAG \
+        --platform linux/amd64,linux/arm64 \
+        --no-cache \
+        --push \
+        .
+
+
+# publishes the application images
+publish-latest:
     docker pull ghcr.io/sebadob/nioca:$TAG
     docker tag ghcr.io/sebadob/nioca:$TAG ghcr.io/sebadob/nioca:latest
     docker push ghcr.io/sebadob/nioca:latest
