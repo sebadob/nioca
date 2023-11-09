@@ -13,7 +13,7 @@ export const REGEX_LINUX_USER = /[a-z0-9-_@.]{2,30}$/gm;
 export const OPT_X509_KEY_ALG = [
 	'RSA',
 	'ECDSA',
-    'ED25519',
+    'EdDSA',
 ];
 
 export const SSH_CERT_AGLS = ['ED25519', 'ECDSAP384', 'ECDSAP256', 'RSASHA512', 'RSASHA256'];

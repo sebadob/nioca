@@ -72,7 +72,7 @@
 
         client.enabled = true;
         client.groupId = groupIdByName(groupName);
-        client.keyAlg = 'ED25519';
+        client.keyAlg = 'EdDSA';
         client.commonName = 'host.example.com';
         client.altNamesDns = [];
         client.altNamesIp = [];

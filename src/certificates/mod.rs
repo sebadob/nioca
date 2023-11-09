@@ -110,7 +110,6 @@ impl SshKeyAlg {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, clap::ValueEnum)]
-#[serde(rename_all = "UPPERCASE")]
 #[allow(clippy::upper_case_acronyms)]
 pub enum X509KeyAlg {
     RSA,

@@ -28,22 +28,7 @@
     let success = false;
     let timer;
 
-    // let altNamesDns = client.altNamesDns?.map(origin => {
-    //     return {
-    //         name: getKey(),
-    //         value: origin,
-    //     }
-    // });
-    // will bind to the validation function inside the ExpandableFormInputs component
     let validateAltNamesDns;
-
-    // let altNamesIp = client.altNamesIp?.map(uri => {
-    //     return {
-    //         name: getKey(),
-    //         value: uri,
-    //     }
-    // });
-    // will bind to the validation function inside the ExpandableFormInputs component
     let validateAltNamesIp;
 
     let keyUsages = X509_KEY_USAGES.map(f => {
@@ -55,6 +40,8 @@
         f.value = client.keyUsageExt?.includes(f.label);
         return f;
     });
+
+    $: console.log(client.keyAlg);
 
     function groupIdByName(name) {
         for (let g of groups) {
@@ -219,7 +206,6 @@
     </Input>
 </div>
 
-<!--TODO: create option selector for all groups-->
 <!-- Group Selector -->
 <div class="data">
     <div class="label">
