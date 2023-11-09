@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.4
+
+This release just solves a small but annoying bug in the UI, where the deserialization for `EdDSA` X509
+token algorithm could not be deserialized correctly.
+
 ## v0.4.3
 
 - license change to Apache-2.0
