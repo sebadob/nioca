@@ -1,4 +1,4 @@
-use crate::constants::OIDC_CALLBACK_URI;
+use crate::constants::{DEV_MODE, OIDC_CALLBACK_URI};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::db::config_oidc::{ConfigOidcEntity, JwtClaim};
 use crate::oidc::CacheMethod;
@@ -141,12 +141,13 @@ impl OidcProvider {
             reqwest::Client::builder()
                 .timeout(Duration::from_secs(10))
                 .connect_timeout(Duration::from_secs(10))
-                .https_only(true)
+                .https_only(*DEV_MODE)
                 .user_agent(format!("Rusty OIDC Client v{}", VERSION))
                 .brotli(true)
                 .http2_prior_knowledge()
                 .add_root_certificate(root_certificate)
                 .timeout(Duration::from_secs(10))
+                .danger_accept_invalid_certs(*DEV_MODE)
                 .build()
                 .unwrap()
         });
