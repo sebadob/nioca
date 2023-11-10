@@ -106,14 +106,14 @@ impl Config {
         let nioca_signing_cert = cert_from_key_pem(&nioca_cert.key, &nioca_cert.cert_pem)?;
         let ca_chain_pem = format!("{}\n{}", nioca_cert.cert_pem, root_cert.cert_pem);
 
+        // This builds the reqwest client with Niocas own Root CA added to the trust anchors for OIDC SSO
+        let reqwest_root_ca =
+            reqwest::tls::Certificate::from_der(root_cert.cert_der.as_bytes())?;
+        OidcProvider::init_client(reqwest_root_ca);
+
         let tx_token_cache = match ConfigOidcEntity::find(&enc_keys).await {
             Ok(c) => {
                 debug!("Found ConfigOidcEntity - spawning Token Cache");
-                // This builds the reqwest client with Niocas own Root CA added to the trust anchors for OIDC SSO
-                let reqwest_root_ca =
-                    reqwest::tls::Certificate::from_der(root_cert.cert_der.as_bytes())?;
-                OidcProvider::init_client(reqwest_root_ca);
-
                 let config = OidcConfig::from_db_entity(c).await?;
                 let tx = validation::init(config, TOKEN_CACHE_LIFESPAN).await?;
                 Some(tx)
