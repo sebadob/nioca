@@ -13,9 +13,7 @@ use axum::headers::Authorization;
 use axum::{Json, TypedHeader};
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
-use std::str::FromStr;
 use time::OffsetDateTime;
-use uuid::Uuid;
 use validator::Validate;
 
 /// Local Database login
@@ -40,14 +38,7 @@ pub async fn post_login(
 
     let sid = get_session_cookie(&jar)?;
     let session = SessionEntity::find(sid).await?;
-
-    // check xsrf
-    if xsrf.0.token() != session.xsrf {
-        return Err(ErrorResponse::new(
-            ErrorResponseType::Unauthorized,
-            "Bad Credentials".to_string(),
-        ));
-    }
+    session.validate_xsrf(xsrf.0.token())?;
 
     // check password
     let pepper = state.read().await.enc_keys.pepper.clone();
@@ -79,60 +70,28 @@ pub async fn post_login(
 )]
 pub async fn get_login_check(
     jar: CookieJar,
-    principal: Result<Principal, ErrorResponse>,
+    principal: Principal,
 ) -> Result<(CookieJar, Json<AuthCheckResponse>), ErrorResponse> {
-    if let Ok(p) = principal {
-        let resp = AuthCheckResponse {
-            principal: p,
-            xsrf: None,
-        };
+    if let Some(cookie) = jar.get(SESSION_COOKIE_XSRF) {
+        let xsrf = cookie.value();
+        let session = SessionEntity::find(principal.session_id).await?;
+        session.validate_xsrf(xsrf)?;
 
-        let jar = CookieJar::new();
-        Ok((jar, Json(resp)))
+        Ok((
+            CookieJar::new().add(delete_session_cookie_xsrf()),
+            Json(AuthCheckResponse {
+                principal,
+                xsrf: Some(xsrf.to_string()),
+            }),
+        ))
     } else {
-        let sid = jar
-            .get(SESSION_COOKIE)
-            .map(|s| s.to_string())
-            .ok_or_else(|| {
-                ErrorResponse::new(ErrorResponseType::Unauthorized, "Unauthorized".to_string())
-            })?;
-        let (_, sid) = sid.split_once('=').unwrap();
-
-        let xsrf = jar
-            .get(SESSION_COOKIE_XSRF)
-            .map(|c| c.to_string())
-            .ok_or_else(|| {
-                ErrorResponse::new(ErrorResponseType::Unauthorized, "Unauthorized".to_string())
-            })?;
-        let (_, xsrf) = xsrf.split_once('=').unwrap();
-
-        let id = match Uuid::from_str(sid) {
-            Ok(id) => id,
-            Err(_) => {
-                return Err(ErrorResponse::new(
-                    ErrorResponseType::BadRequest,
-                    "Bad session ID".to_string(),
-                ));
-            }
-        };
-        let session = SessionEntity::find(id).await?;
-
-        if session.xsrf != xsrf {
-            return Err(ErrorResponse::new(
-                ErrorResponseType::BadRequest,
-                "Bad XSRF Token".to_string(),
-            ));
-        }
-
-        let principal = Principal::from_session(session);
-
-        let resp = AuthCheckResponse {
-            principal,
-            xsrf: Some(xsrf.to_string()),
-        };
-
-        let jar = CookieJar::new().add(delete_session_cookie_xsrf());
-        Ok((jar, Json(resp)))
+        Ok((
+            CookieJar::new(),
+            Json(AuthCheckResponse {
+                principal,
+                xsrf: None,
+            }),
+        ))
     }
 }
 
@@ -147,20 +106,14 @@ pub async fn get_login_check(
 )]
 pub async fn post_logout(
     jar: CookieJar,
-    TypedHeader(xsrf): TypedHeader<Authorization<Bearer>>,
+    principal: Result<Principal, ErrorResponse>,
 ) -> Result<CookieJar, ErrorResponse> {
     let sid = get_session_cookie(&jar)?;
-    let session = SessionEntity::find(sid).await?;
 
-    // check xsrf
-    if xsrf.0.token() != session.xsrf {
-        return Err(ErrorResponse::new(
-            ErrorResponseType::Unauthorized,
-            "Bad Credentials".to_string(),
-        ));
+    // we don't need to invalidate anything, if the principal was invalid already
+    if principal.is_ok() {
+        SessionEntity::invalidate(sid).await?;
     }
-
-    SessionEntity::invalidate(sid).await?;
 
     let cookie = Cookie::build(SESSION_COOKIE, sid.to_string())
         .domain(&*PUB_URL)
@@ -177,13 +130,13 @@ pub async fn post_logout(
 
 /// Change the local root users password
 #[utoipa::path(
-put,
-tag = "unsealed",
-path = "/api/password_change",
-responses(
-(status = 200, description = "Ok"),
-(status = 403, description = "Forbidden", body = ErrorResponse),
-),
+    put,
+    tag = "unsealed",
+    path = "/api/password_change",
+    responses(
+        (status = 200, description = "Ok"),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+    ),
 )]
 pub async fn put_password_change(
     principal: Principal,
@@ -232,13 +185,13 @@ pub async fn put_password_change(
     ),
 )]
 pub async fn post_session() -> Result<(CookieJar, Json<SessionResponse>), ErrorResponse> {
-    let session = SessionEntity::new_local().await?;
+    let (session, xsrf) = SessionEntity::new_local().await?;
 
     let cookie = build_session_cookie(session.id.to_string());
     let jar = CookieJar::new().add(cookie);
 
     let resp = SessionResponse {
-        xsrf: session.xsrf,
+        xsrf,
         expires: session.expires.to_string(),
     };
 

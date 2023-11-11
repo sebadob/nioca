@@ -6,6 +6,7 @@ use crate::util::get_session_cookie;
 use axum::async_trait;
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
+use axum::http::Method;
 use axum_extra::extract::CookieJar;
 use serde::Serialize;
 use std::fmt::Display;
@@ -133,11 +134,8 @@ where
             )
         })?;
         // check xsrf
-        if xsrf.to_str().unwrap_or("UNKNOWN") != session.xsrf {
-            return Err(ErrorResponse::new(
-                ErrorResponseType::Unauthorized,
-                "Bad Credentials".to_string(),
-            ));
+        if parts.method != Method::GET {
+            session.validate_xsrf(xsrf.to_str().unwrap_or("UNKNOWN"))?;
         }
 
         // expand the session lifetime
