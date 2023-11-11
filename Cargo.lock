@@ -1731,7 +1731,7 @@ dependencies = [
 
 [[package]]
 name = "nioca"
-version = "0.4.4"
+version = "0.4.5-20231111"
 dependencies = [
  "aes",
  "anyhow",
