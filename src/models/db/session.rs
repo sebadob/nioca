@@ -1,6 +1,6 @@
 use crate::config::Db;
 use crate::constants::{SESSION_TIMEOUT, SESSION_TIMEOUT_NEW};
-use crate::models::api::error_response::ErrorResponse;
+use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::db::config_oidc::JwtClaimTyp;
 use crate::models::db::enc_key::EncKeyEntity;
 use crate::models::db::user::UserEntity;
@@ -8,6 +8,7 @@ use crate::oidc::handler::OidcTokenSet;
 use crate::oidc::principal::JwtIdClaims;
 use crate::oidc::validation::OIDC_CONFIG;
 use crate::util::secure_random;
+use ring::digest;
 use sqlx::{query, query_as};
 use std::ops::{Add, Sub};
 use time::OffsetDateTime;
@@ -19,7 +20,7 @@ pub struct SessionEntity {
     pub local: bool,
     pub created: OffsetDateTime,
     pub expires: OffsetDateTime,
-    pub xsrf: String,
+    pub xsrf: Vec<u8>,
     pub authenticated: bool,
     pub user_id: Option<Uuid>,
     pub email: Option<String>,
@@ -30,13 +31,11 @@ pub struct SessionEntity {
 }
 
 impl SessionEntity {
-    pub async fn new_local(// user_id: Option<Uuid>,
-        // email: Option<String>,
-        // roles: Option<Vec<String>>,
-        // groups: Option<Vec<String>>,
-    ) -> Result<Self, ErrorResponse> {
+    /// Creates a new local session and returns (Session, XSRF_Token)
+    pub async fn new_local() -> Result<(Self, String), ErrorResponse> {
         let id = Uuid::new_v4();
-        let xsrf = secure_random(48);
+        let xsrf_plain = secure_random(48);
+        let xsrf = Self::hash_xsrf(xsrf_plain.as_bytes()).as_ref().to_vec();
         let created = OffsetDateTime::now_utc();
         let expires = created.add(SESSION_TIMEOUT_NEW);
 
@@ -83,14 +82,14 @@ impl SessionEntity {
         //     .execute(&*db)
         //     .await?;
 
-        Ok(slf)
+        Ok((slf, xsrf_plain))
     }
 
     // Expands the session timeout by the default value
     pub async fn expand(&self) -> Result<(), ErrorResponse> {
         let exp = OffsetDateTime::now_utc().add(SESSION_TIMEOUT);
         query!(
-            "update sessions set expires = $1 where id = $2",
+            "UPDATE sessions SET expires = $1 WHERE id = $2",
             exp,
             self.id
         )
@@ -101,8 +100,10 @@ impl SessionEntity {
 
     pub async fn insert(&self) -> Result<(), ErrorResponse> {
         query!(
-            "insert into sessions (id, local, created, expires, xsrf, authenticated, user_id, email, \
-                roles, groups, is_admin, is_user) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
+            r#"INSERT INTO sessions
+            (id, local, created, expires, xsrf, authenticated, user_id, email, roles, groups,
+            is_admin, is_user)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)"#,
             self.id,
             self.local,
             self.created,
@@ -116,7 +117,7 @@ impl SessionEntity {
             self.is_admin,
             self.is_user,
         )
-            .execute(Db::conn())
+        .execute(Db::conn())
         .await?;
         Ok(())
     }
@@ -129,19 +130,21 @@ impl SessionEntity {
     // }
 
     pub async fn find(id: Uuid) -> Result<Self, ErrorResponse> {
-        query_as!(Self, "select * from sessions where id = $1", id)
+        query_as!(Self, "SELECT * FROM sessions WHERE id = $1", id)
             .fetch_one(Db::conn())
             .await
             .map_err(ErrorResponse::from)
     }
 
+    /// Creates a new session from SSO and returns (Session, XSRF_Token)
     pub async fn from_id_claims(
         enc_key: &EncKeyEntity,
         claims: JwtIdClaims,
         ts: &OidcTokenSet,
-    ) -> Result<Self, ErrorResponse> {
+    ) -> Result<(Self, String), ErrorResponse> {
         let id = Uuid::new_v4();
-        let xsrf = secure_random(48);
+        let xsrf_plain = secure_random(48);
+        let xsrf = Self::hash_xsrf(xsrf_plain.as_bytes()).as_ref().to_vec();
         let created = OffsetDateTime::now_utc();
         let expires = created.add(SESSION_TIMEOUT);
 
@@ -198,7 +201,7 @@ impl SessionEntity {
 
         slf.insert().await?;
 
-        Ok(slf)
+        Ok((slf, xsrf_plain))
     }
 
     // pub async fn delete(db: DbPool, id: Uuid) -> Result<(), ErrorResponse> {
@@ -211,7 +214,7 @@ impl SessionEntity {
     /// Deletes all sessions that have expired more than 1 hour ago
     pub async fn delete_expired() -> Result<(), ErrorResponse> {
         let threshold = OffsetDateTime::now_utc().sub(time::Duration::hours(1));
-        query!("delete from sessions where expires < $1", threshold)
+        query!("DELETE FROM sessions WHERE expires < $1", threshold)
             .execute(Db::conn())
             .await?;
         Ok(())
@@ -219,22 +222,40 @@ impl SessionEntity {
 
     pub async fn invalidate(id: Uuid) -> Result<(), ErrorResponse> {
         let now = OffsetDateTime::now_utc().sub(time::Duration::seconds(10));
-        query!("update sessions set expires = $1 where id = $2", now, id)
+        query!("UPDATE sessions SET expires = $1 WHERE id = $2", now, id)
             .execute(Db::conn())
             .await?;
         Ok(())
+    }
+
+    #[inline]
+    pub fn hash_xsrf(xsrf_token: &[u8]) -> digest::Digest {
+        digest::digest(&digest::SHA256, xsrf_token)
     }
 
     // Expands the session timeout by the default value and sets it to authenticated
     pub async fn set_authenticated(&self) -> Result<(), ErrorResponse> {
         let exp = OffsetDateTime::now_utc().add(SESSION_TIMEOUT);
         query!(
-            "update sessions set expires = $1, authenticated = true where id = $2",
+            "UPDATE sessions SET expires = $1, authenticated = true WHERE id = $2",
             exp,
             self.id
         )
         .execute(Db::conn())
         .await?;
         Ok(())
+    }
+
+    #[inline]
+    pub fn validate_xsrf(&self, xsrf_token: &str) -> Result<(), ErrorResponse> {
+        let hash = Self::hash_xsrf(xsrf_token.as_bytes());
+        if self.xsrf == hash.as_ref() {
+            Ok(())
+        } else {
+            Err(ErrorResponse::new(
+                ErrorResponseType::Unauthorized,
+                "Invalid XSRF Token",
+            ))
+        }
     }
 }
