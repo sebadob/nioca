@@ -181,6 +181,47 @@ pub struct UnsealRequest {
     pub xsrf: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserGroupAccessSshRequest {
+    pub enabled: bool,
+    pub key_alg: SshKeyAlg,
+    #[validate(custom(function = "validate_vec_principal"))]
+    pub principals: Vec<String>,
+    pub force_command: Option<String>,
+    pub permit_x11_forwarding: Option<bool>,
+    pub permit_agent_forwarding: Option<bool>,
+    pub permit_port_forwarding: Option<bool>,
+    pub permit_pty: Option<bool>,
+    pub permit_user_rc: Option<bool>,
+    #[validate(range(min = 1))]
+    pub valid_secs: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserGroupAccessX509Request {
+    pub enabled: bool,
+    pub key_alg: X509KeyAlg,
+    pub key_usage: Vec<X509KeyUsages>,
+    pub key_usage_ext: Vec<X509KeyUsagesExt>,
+    #[validate(range(min = 1))]
+    pub valid_hours: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UsersGroupAccessRequest {
+    pub user_id: String,
+    pub group_id: String,
+    pub secret_create: bool,
+    pub secret_read: bool,
+    pub secret_update: bool,
+    pub secret_delete: bool,
+    pub access_ssh: UserGroupAccessSshRequest,
+    pub access_x509: UserGroupAccessX509Request,
+}
+
 // #[derive(Debug, Deserialize, Validate, ToSchema)]
 // #[serde(rename_all = "camelCase")]
 // pub struct X509Request {

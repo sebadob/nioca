@@ -7,6 +7,7 @@ pub mod groups;
 pub mod oidc;
 pub mod sealed;
 pub mod unsealed;
+pub mod users;
 
 pub type AppStateExtract = axum::extract::State<AppState>;
 pub type AppStateSealedExtract = axum::extract::State<AppStateSealed>;

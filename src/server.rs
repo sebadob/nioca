@@ -4,7 +4,7 @@ use crate::config::{Config, ConfigSealed, Db, EncKeys};
 use crate::constants::{AUTO_UNSEAL, DEV_MODE, INSTANCE_UUID, XSRF_HEADER};
 use crate::models::api::openapi::ApiDoc;
 use crate::models::db::enc_key::EncKeyEntity;
-use crate::routes::{ca, groups, unsealed};
+use crate::routes::{ca, groups, unsealed, users};
 use crate::routes::{clients_ssh, sealed};
 use crate::routes::{clients_x509, oidc};
 use crate::schedulers::scheduler_main;
@@ -155,7 +155,6 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
         )
         .await?
     };
-    debug!("\n\n{:?}", tls_config_unseal);
 
     // after startup, everything is sealed -> start up special routes first
     let (tx_enc_key, rx_enc_keys) = flume::unbounded();
@@ -304,7 +303,15 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
                     get(oidc::get_config_oidc).put(oidc::put_config_oidc),
                 )
                 .route("/oidc/exists", get(oidc::get_oidc_exists))
-                .route("/status", get(unsealed::get_status)),
+                .route("/status", get(unsealed::get_status))
+                .route("/users", get(users::get_users))
+                .route("/users/:id/access", get(users::get_user_group_access))
+                .route(
+                    "/users/:user_id/access/:group_id",
+                    post(users::post_user_group_access)
+                        .put(users::put_user_group_access)
+                        .delete(users::delete_user_group_access),
+                ),
         )
         .route("/unseal/status", get(unsealed::get_status))
         .route("/root.fingerprint", get(unsealed::get_root_fingerprint))
