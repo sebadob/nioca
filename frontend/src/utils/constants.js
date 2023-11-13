@@ -50,6 +50,18 @@ export const X509_KEY_USAGES = [
 	},
 ];
 
+export const X509_KEY_USAGES_SSO = [
+	{
+		label: 'DigitalSignature',
+		value: false,
+	},
+	{
+		label: 'ContentCommitment',
+		value: false,
+	},
+];
+
+
 export const X509_KEY_USAGES_EXT = [
 	{
 		label: 'Any',
@@ -73,6 +85,21 @@ export const X509_KEY_USAGES_EXT = [
 	},
 	{
 		label: 'TimeStamping',
+		value: false,
+	},
+];
+
+export const X509_KEY_USAGES_EXT_SSO = [
+	{
+		label: 'ClientAuth',
+		value: false,
+	},
+	{
+		label: 'CodeSigning',
+		value: false,
+	},
+	{
+		label: 'EmailProtection',
 		value: false,
 	},
 ];

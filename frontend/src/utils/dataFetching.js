@@ -298,3 +298,39 @@ export async function fetchSshCert(id, secret) {
 		},
 	});
 }
+
+export async function fetchGetUsers() {
+	return await fetch('/api/users', {
+		method: 'GET',
+		headers: HEADERS_XSRF,
+	});
+}
+
+export async function fetchGetUserAccess(userId) {
+	return await fetch(`/api/users/${userId}/access`, {
+		method: 'GET',
+		headers: HEADERS_XSRF,
+	});
+}
+
+export async function fetchPostUserGroupAccess(userId, groupId) {
+	return await fetch(`/api/users/${userId}/access/${groupId}`, {
+		method: 'POST',
+		headers: HEADERS_XSRF,
+	});
+}
+
+export async function fetchPutUserGroupAccess(userId, groupId, data) {
+	return await fetch(`/api/users/${userId}/access/${groupId}`, {
+		method: 'PUT',
+		headers: HEADERS_XSRF,
+		body: JSON.stringify(data),
+	});
+}
+
+export async function fetchDeleteUserGroupAccess(userId, groupId) {
+	return await fetch(`/api/users/${userId}/access/${groupId}`, {
+		method: 'DELETE',
+		headers: HEADERS_XSRF,
+	});
+}

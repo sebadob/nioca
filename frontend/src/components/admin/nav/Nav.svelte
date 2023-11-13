@@ -8,9 +8,9 @@
     import NavSection from "./NavSection.svelte";
     import IconShieldCheck from "$lib/icons/IconShieldCheck.svelte";
     import {storePrincipal} from "../../../stores/principal.js";
-    import {onMount, tick} from "svelte";
     import IconKey from "../../icons/IconKey.svelte";
     import IconQueueList from "../../icons/IconQueueList.svelte";
+    import IconUsers from "../../icons/IconUsers.svelte";
 
     export let selected = '';
     let colors = {};
@@ -62,6 +62,10 @@
                     </NavEntry>
                 </div>
             </NavSection>
+
+            <NavEntry bind:color={colors.users} label="Users" bind:selected>
+                <IconUsers color={colors.users}/>
+            </NavEntry>
 
             <NavEntry bind:color={colors.config} label="Config" bind:selected>
                 <IconWrenchScrew color={colors.config}/>

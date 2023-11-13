@@ -11,6 +11,7 @@
     import CaX509 from "./caX509/CaX509Main.svelte";
     import Password from "./password/Password.svelte";
     import Groups from "./groups/Groups.svelte";
+    import Users from "./users/Users.svelte";
 
     let selected = 'X509';
     $: if (selected === 'Logout') {
@@ -51,6 +52,11 @@
     {:else if 'SSH CA' === selected}
         <ContentWrapper>
             <CaSsh/>
+        </ContentWrapper>
+
+    {:else if 'Users' === selected}
+        <ContentWrapper>
+            <Users/>
         </ContentWrapper>
 
     {:else if 'Config' === selected}
