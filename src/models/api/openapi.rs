@@ -1,3 +1,8 @@
+use std::env;
+
+use utoipa::openapi::Server;
+use utoipa::{openapi, OpenApi};
+
 use crate::certificates;
 use crate::constants::PUB_URL_WITH_SCHEME;
 use crate::models::api::error_response;
@@ -8,11 +13,9 @@ use crate::routes::clients_x509;
 use crate::routes::oidc;
 use crate::routes::sealed;
 use crate::routes::unsealed;
+use crate::routes::users;
 use crate::service;
 use crate::VERSION;
-use std::env;
-use utoipa::openapi::Server;
-use utoipa::{openapi, OpenApi};
 
 /// The OpenAPI Documentation
 #[derive(OpenApi)]
@@ -32,6 +35,9 @@ use utoipa::{openapi, OpenApi};
         oidc::get_oidc_exists,
         oidc::get_config_oidc,
         oidc::put_config_oidc,
+        users::get_users,
+        users::get_user_group_access,
+        users::post_user_group_access,
         sealed::post_init,
         sealed::post_init_check,
         sealed::post_master_shard,
@@ -46,6 +52,8 @@ use utoipa::{openapi, OpenApi};
     components(
         schemas(
             certificates::CertFormat,
+            certificates::SshKeyAlg,
+            certificates::X509KeyAlg,
             certificates::X509KeyUsages,
             certificates::X509KeyUsagesExt,
             error_response::ErrorResponse,
@@ -59,8 +67,8 @@ use utoipa::{openapi, OpenApi};
             request::JwtClaimTypRequest,
             request::UnsealRequest,
             response::CasSshResponse,
-        response::CasX509Response,
-        response::X509CertificatesInspectResponse,
+            response::CasX509Response,
+            response::X509CertificatesInspectResponse,
             response::CertificateInspectResponse,
             response::CertX509Response,
             response::ClientSshResponse,
@@ -72,7 +80,7 @@ use utoipa::{openapi, OpenApi};
             response::SessionResponse,
             response::SealedStatus,
             response::SshCertificateResponse,
-        service::x509::CheckedCerts,
+            service::x509::CheckedCerts,
         ),
     ),
     tags(

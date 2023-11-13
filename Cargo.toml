@@ -1,6 +1,6 @@
 [package]
 name = "nioca"
-version = "0.4.5-20231111"
+version = "0.5.0-20231113"
 edition = "2021"
 authors = ["Sebastian Dobe <sebastiandobe@mailbox.org>"]
 license = "Apache-2.0"

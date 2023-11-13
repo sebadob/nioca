@@ -41,8 +41,6 @@
         return f;
     });
 
-    $: console.log(client.keyAlg);
-
     function groupIdByName(name) {
         for (let g of groups) {
             if (g.name === name) {

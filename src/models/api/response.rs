@@ -1,4 +1,4 @@
-use crate::certificates::{CertFormat, SshKeyAlg, X509KeyUsages, X509KeyUsagesExt};
+use crate::certificates::{CertFormat, SshKeyAlg, X509KeyAlg, X509KeyUsages, X509KeyUsagesExt};
 use crate::constants::OIDC_CALLBACK_URI;
 use crate::models::api::principal::Principal;
 use crate::models::db::ca_cert_ssh::{CaCertSshEntity, SshKeyPairOpenssh};
@@ -6,6 +6,8 @@ use crate::models::db::client_ssh::{ClientSshEntity, SshCertType};
 use crate::models::db::client_x509::ClientX509Entity;
 use crate::models::db::config_oidc::{ConfigOidcEntity, JwtClaim};
 use crate::models::db::groups::GroupEntity;
+use crate::models::db::user::UserEntity;
+use crate::models::db::user_group_access::UsersGroupAccess;
 use serde::{Deserialize, Serialize};
 use tracing::info;
 use utoipa::ToSchema;
@@ -412,6 +414,28 @@ pub struct SshCertificateResponse {
 }
 
 #[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UserResponse {
+    pub id: String,
+    pub oidc_id: String,
+    pub email: String,
+    pub given_name: Option<String>,
+    pub family_name: Option<String>,
+}
+
+impl From<UserEntity> for UserResponse {
+    fn from(value: UserEntity) -> Self {
+        Self {
+            id: value.id.to_string(),
+            oidc_id: value.oidc_id,
+            email: value.email,
+            given_name: value.given_name,
+            family_name: value.family_name,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, ToSchema)]
 pub struct X509ExtensionResponse {
     pub critical: bool,
     pub value: Vec<String>,
@@ -447,4 +471,74 @@ pub struct SealedStatus {
     pub master_shard_2: bool,
     pub is_ready: bool,
     pub key_add_rate_limit: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserGroupAccessSshResponse {
+    pub enabled: bool,
+    pub key_alg: SshKeyAlg,
+    pub principals: Vec<String>,
+    pub force_command: Option<String>,
+    pub permit_x11_forwarding: Option<bool>,
+    pub permit_agent_forwarding: Option<bool>,
+    pub permit_port_forwarding: Option<bool>,
+    pub permit_pty: Option<bool>,
+    pub permit_user_rc: Option<bool>,
+    pub valid_secs: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserGroupAccessX509Response {
+    pub enabled: bool,
+    pub key_alg: X509KeyAlg,
+    pub key_usage: Vec<X509KeyUsages>,
+    pub key_usage_ext: Vec<X509KeyUsagesExt>,
+    pub valid_hours: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UsersGroupAccessResponse {
+    pub user_id: String,
+    pub group_id: String,
+    pub secret_create: bool,
+    pub secret_read: bool,
+    pub secret_update: bool,
+    pub secret_delete: bool,
+    pub access_ssh: UserGroupAccessSshResponse,
+    pub access_x509: UserGroupAccessX509Response,
+}
+
+impl From<UsersGroupAccess> for UsersGroupAccessResponse {
+    fn from(value: UsersGroupAccess) -> Self {
+        Self {
+            user_id: value.user_id.to_string(),
+            group_id: value.group_id.to_string(),
+            secret_create: value.secret_create,
+            secret_read: value.secret_read,
+            secret_update: value.secret_update,
+            secret_delete: value.secret_delete,
+            access_ssh: UserGroupAccessSshResponse {
+                enabled: value.access_ssh.enabled,
+                key_alg: value.access_ssh.key_alg,
+                principals: value.access_ssh.principals,
+                force_command: value.access_ssh.force_command,
+                permit_x11_forwarding: value.access_ssh.permit_x11_forwarding,
+                permit_agent_forwarding: value.access_ssh.permit_agent_forwarding,
+                permit_port_forwarding: value.access_ssh.permit_port_forwarding,
+                permit_pty: value.access_ssh.permit_pty,
+                permit_user_rc: value.access_ssh.permit_user_rc,
+                valid_secs: value.access_ssh.valid_secs,
+            },
+            access_x509: UserGroupAccessX509Response {
+                enabled: value.access_x509.enabled,
+                key_alg: value.access_x509.key_alg,
+                key_usage: value.access_x509.key_usage,
+                key_usage_ext: value.access_x509.key_usage_ext,
+                valid_hours: value.access_x509.valid_hours,
+            },
+        }
+    }
 }

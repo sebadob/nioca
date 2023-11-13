@@ -40,11 +40,11 @@
 
 <WithUnsealed>
     {#if isLoggedIn}
-        {#if principal}
-            <Draggable>
-                <Principal bind:principal/>
-            </Draggable>
-        {/if}
+        <!--{#if principal}-->
+        <!--    <Draggable>-->
+        <!--        <Principal bind:principal/>-->
+        <!--    </Draggable>-->
+        <!--{/if}-->
 
         {#if principal.isAdmin}
             <AdminMain/>

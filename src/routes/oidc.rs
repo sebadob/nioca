@@ -112,14 +112,13 @@ pub async fn get_oidc_callback(
 ) -> Result<Response<Body>, ErrorResponse> {
     let enc_key_entity = state.read().await.enc_keys.enc_key.clone();
 
-    let (jar, token_set, id_claims) = if *DEV_MODE {
+    let (jar, _token_set, id_claims) = if *DEV_MODE {
         oidc_handler::oidc_callback(&jar, params, &enc_key_entity.value, true).await?
     } else {
         oidc_handler::oidc_callback(&jar, params, &enc_key_entity.value, false).await?
     };
 
-    let (session, xsrf) =
-        SessionEntity::from_id_claims(&enc_key_entity, id_claims, &token_set).await?;
+    let (session, xsrf) = SessionEntity::from_id_claims(id_claims).await?;
     tracing::warn!("\n\nxsrf in oidc callback: {}\n", xsrf);
     let session_cookie = build_session_cookie(session.id.to_string());
     let session_cookie_xsrf = build_session_cookie_xsrf(xsrf);

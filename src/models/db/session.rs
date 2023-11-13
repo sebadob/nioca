@@ -2,9 +2,7 @@ use crate::config::Db;
 use crate::constants::{SESSION_TIMEOUT, SESSION_TIMEOUT_NEW};
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::db::config_oidc::JwtClaimTyp;
-use crate::models::db::enc_key::EncKeyEntity;
 use crate::models::db::user::UserEntity;
-use crate::oidc::handler::OidcTokenSet;
 use crate::oidc::principal::JwtIdClaims;
 use crate::oidc::validation::OIDC_CONFIG;
 use crate::util::secure_random;
@@ -39,25 +37,6 @@ impl SessionEntity {
         let created = OffsetDateTime::now_utc();
         let expires = created.add(SESSION_TIMEOUT_NEW);
 
-        // let slf = if user_id.is_some() {
-        //     let rls = roles.map(|r| vec_to_csv(&r));
-        //     let grps = groups.map(|g| vec_to_csv(&g));
-        //
-        //     Self {
-        //         id,
-        //         local: false,
-        //         created,
-        //         expires,
-        //         xsrf,
-        //         authenticated: false,
-        //         user_id,
-        //         email,
-        //         roles: rls,
-        //         groups: grps,
-        //         is_admin: true,
-        //         is_user: true,
-        //     }
-        // } else {
         let slf = Self {
             id,
             local: true,
@@ -72,15 +51,8 @@ impl SessionEntity {
             is_admin: Some(true),
             is_user: Some(true),
         };
-        // };
 
         slf.insert().await?;
-        // query!(
-        //         "insert into sessions (id, local, created, expires, xsrf, authenticated, email, roles, groups) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
-        //         slf.id, slf.local, slf.created, slf.expires, slf.xsrf, slf.authenticated, slf.email, slf.roles, slf.groups,
-        //     )
-        //     .execute(&*db)
-        //     .await?;
 
         Ok((slf, xsrf_plain))
     }
@@ -122,13 +94,6 @@ impl SessionEntity {
         Ok(())
     }
 
-    // pub async fn find_all(db: DbPool) -> Result<Vec<Self>, ErrorResponse> {
-    //     query_as!(Self, "select * from sessions")
-    //         .fetch_all(&db)
-    //         .await
-    //         .map_err(ErrorResponse::from)
-    // }
-
     pub async fn find(id: Uuid) -> Result<Self, ErrorResponse> {
         query_as!(Self, "SELECT * FROM sessions WHERE id = $1", id)
             .fetch_one(Db::conn())
@@ -137,21 +102,18 @@ impl SessionEntity {
     }
 
     /// Creates a new session from SSO and returns (Session, XSRF_Token)
-    pub async fn from_id_claims(
-        enc_key: &EncKeyEntity,
-        claims: JwtIdClaims,
-        ts: &OidcTokenSet,
-    ) -> Result<(Self, String), ErrorResponse> {
+    pub async fn from_id_claims(claims: JwtIdClaims) -> Result<(Self, String), ErrorResponse> {
         let id = Uuid::new_v4();
         let xsrf_plain = secure_random(48);
         let xsrf = Self::hash_xsrf(xsrf_plain.as_bytes()).as_ref().to_vec();
         let created = OffsetDateTime::now_utc();
         let expires = created.add(SESSION_TIMEOUT);
 
-        let user = if let Some(user) = UserEntity::find_by_email(&claims.email).await? {
+        let user = if let Some(user) = UserEntity::find_by_oidc_id(&claims.sub).await? {
+            user.update_check(&claims).await?;
             user
         } else {
-            UserEntity::insert(claims.email.clone(), Some(ts), enc_key).await?
+            UserEntity::insert(&claims).await?
         };
         let roles = claims.roles.join(",");
         let groups = claims.groups.map(|g| g.join(","));
@@ -203,13 +165,6 @@ impl SessionEntity {
 
         Ok((slf, xsrf_plain))
     }
-
-    // pub async fn delete(db: DbPool, id: Uuid) -> Result<(), ErrorResponse> {
-    //     query!("delete from sessions where id = $1", id)
-    //         .execute(&db)
-    //         .await?;
-    //     Ok(())
-    // }
 
     /// Deletes all sessions that have expired more than 1 hour ago
     pub async fn delete_expired() -> Result<(), ErrorResponse> {

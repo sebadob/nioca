@@ -191,6 +191,7 @@ pub struct JwtAccessClaims {
 #[derive(Debug, Deserialize)]
 pub struct JwtIdClaims {
     pub typ: JwtType,
+    pub sub: String,
     pub azp: String,
     pub aud: String,
     pub iss: String,
