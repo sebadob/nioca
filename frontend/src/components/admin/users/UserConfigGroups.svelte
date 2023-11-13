@@ -1,7 +1,6 @@
 <script>
     import IconPlus from "$lib/icons/IconPlus.svelte";
 
-    export let user;
     export let groups = [];
     export let accessGroups = [];
     export let selected;

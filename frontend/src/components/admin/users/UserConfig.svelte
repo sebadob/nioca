@@ -20,7 +20,6 @@
 
 <div class="container">
     <UserConfigGroups
-            bind:user
             bind:groups
             bind:accessGroups
             bind:selected
