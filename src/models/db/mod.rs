@@ -12,3 +12,4 @@ pub mod master_key;
 pub mod sealed;
 pub mod session;
 pub mod user;
+pub mod user_group_access;
