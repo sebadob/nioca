@@ -10,6 +10,7 @@ use axum::http::Method;
 use axum_extra::extract::CookieJar;
 use serde::Serialize;
 use std::fmt::Display;
+use std::str::FromStr;
 use std::sync::Arc;
 use time::OffsetDateTime;
 use tokio::sync::RwLock;
@@ -68,6 +69,25 @@ impl Principal {
             if a {
                 return Ok(());
             }
+        }
+
+        Err(ErrorResponse::new(
+            ErrorResponseType::Forbidden,
+            "Admin access only".to_string(),
+        ))
+    }
+
+    pub fn is_user(&self, user_id: &str) -> Result<(), ErrorResponse> {
+        if self.local {
+            return Err(ErrorResponse::new(
+                ErrorResponseType::Forbidden,
+                "No Access to this users resource".to_string(),
+            ));
+        }
+
+        let user_id = Uuid::from_str(user_id)?;
+        if Some(user_id) == self.user_id {
+            return Ok(());
         }
 
         Err(ErrorResponse::new(

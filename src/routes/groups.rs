@@ -1,3 +1,11 @@
+use std::str::FromStr;
+
+use axum::extract::Path;
+use axum::Json;
+use tracing::{error, warn};
+use uuid::Uuid;
+use validator::Validate;
+
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::models::api::principal::Principal;
 use crate::models::api::request::{GroupCreateRequest, GroupUpdateRequest};
@@ -5,22 +13,16 @@ use crate::models::api::response::GroupResponse;
 use crate::models::db::client_ssh::ClientSshEntity;
 use crate::models::db::client_x509::ClientX509Entity;
 use crate::models::db::groups::GroupEntity;
-use axum::extract::Path;
-use axum::Json;
-use std::str::FromStr;
-use tracing::{error, warn};
-use uuid::Uuid;
-use validator::Validate;
 
 #[utoipa::path(
-get,
-tag = "unsealed",
-path = "/api/groups",
-responses(
-(status = 200, description = "Ok", body = GroupResponse),
-(status = 401, description = "Unauthorized", body = ErrorResponse),
-(status = 403, description = "Forbidden", body = ErrorResponse),
-),
+    get,
+    tag = "unsealed",
+    path = "/api/groups",
+    responses(
+        (status = 200, description = "Ok", body = GroupResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+    ),
 )]
 pub async fn get_groups(principal: Principal) -> Result<Json<Vec<GroupResponse>>, ErrorResponse> {
     principal.is_admin()?;
@@ -33,14 +35,15 @@ pub async fn get_groups(principal: Principal) -> Result<Json<Vec<GroupResponse>>
 }
 
 #[utoipa::path(
-post,
-tag = "unsealed",
-path = "/api/groups",
-responses(
-(status = 200, description = "Ok"),
-(status = 401, description = "Unauthorized", body = ErrorResponse),
-(status = 403, description = "Forbidden", body = ErrorResponse),
-),
+    post,
+    tag = "unsealed",
+    path = "/api/groups",
+    request_body = GroupCreateRequest,
+    responses(
+        (status = 200, description = "Ok"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+    ),
 )]
 pub async fn post_group(
     principal: Principal,
@@ -54,14 +57,15 @@ pub async fn post_group(
 }
 
 #[utoipa::path(
-put,
-tag = "unsealed",
-path = "/api/groups/:id",
-responses(
-(status = 200, description = "Ok"),
-(status = 401, description = "Unauthorized", body = ErrorResponse),
-(status = 403, description = "Forbidden", body = ErrorResponse),
-),
+    put,
+    tag = "unsealed",
+    path = "/api/groups/:id",
+    request_body = GroupUpdateRequest,
+    responses(
+        (status = 200, description = "Ok"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+    ),
 )]
 pub async fn put_group(
     principal: Principal,
@@ -77,14 +81,14 @@ pub async fn put_group(
 }
 
 #[utoipa::path(
-delete,
-tag = "unsealed",
-path = "/api/groups/:id",
-responses(
-(status = 200, description = "Ok"),
-(status = 401, description = "Unauthorized", body = ErrorResponse),
-(status = 403, description = "Forbidden", body = ErrorResponse),
-),
+    delete,
+    tag = "unsealed",
+    path = "/api/groups/:id",
+    responses(
+        (status = 200, description = "Ok"),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 403, description = "Forbidden", body = ErrorResponse),
+    ),
 )]
 pub async fn delete_group(
     principal: Principal,
