@@ -1,11 +1,13 @@
 use crate::models::api::error_response::{ErrorResponse, ErrorResponseType};
 use crate::oidc::validation::{validate_token, TokenCacheReq};
 use crate::oidc::{extract_token_claims, validate_access_claims};
+use axum::async_trait;
 use axum::extract::FromRequestParts;
-use axum::headers::authorization::Bearer;
-use axum::headers::Authorization;
 use axum::http::request::Parts;
-use axum::{async_trait, TypedHeader};
+use axum_extra::headers::authorization::Bearer;
+use axum_extra::headers::Authorization;
+use axum_extra::TypedHeader;
+
 use serde::Deserialize;
 use std::fmt::Display;
 use std::sync::Arc;
