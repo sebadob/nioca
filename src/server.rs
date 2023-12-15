@@ -1,3 +1,30 @@
+use std::env;
+use std::net::SocketAddr;
+use std::str::FromStr;
+use std::sync::Arc;
+use std::time::Duration;
+
+use axum::body::Bytes;
+use axum::handler::HandlerWithoutStateExt;
+use axum::http::{header, HeaderName, StatusCode, Uri};
+use axum::response::Redirect;
+use axum::routing::{delete, get, post, put};
+use axum::{extract, BoxError, Router};
+use axum_extra::headers::HeaderValue;
+use axum_server::tls_rustls::RustlsConfig;
+use axum_server::Handle;
+use base64::{engine::general_purpose, Engine as _};
+use tokio::net::TcpListener;
+use tokio::time;
+use tower::ServiceBuilder;
+use tower_http::services::ServeDir;
+use tower_http::trace::DefaultOnResponse;
+use tower_http::{trace::TraceLayer, LatencyUnit, ServiceBuilderExt};
+use tracing::{debug, info, warn};
+use utoipa_swagger_ui::SwaggerUi;
+use uuid::Uuid;
+use x509_parser::nom::AsBytes;
+
 use crate::certificates::encryption::{kdf_danger_static, EncAlg};
 use crate::certificates::x509::end_entity::nioca_server_cert;
 use crate::config::{Config, ConfigSealed, Db, EncKeys};
@@ -10,30 +37,6 @@ use crate::routes::{clients_x509, oidc};
 use crate::schedulers::scheduler_main;
 use crate::service::password_hasher;
 use crate::VERSION;
-use axum::body::Bytes;
-use axum::handler::HandlerWithoutStateExt;
-use axum::headers::HeaderValue;
-use axum::http::{header, HeaderName, StatusCode, Uri};
-use axum::response::Redirect;
-use axum::routing::{delete, get, post, put};
-use axum::{extract, BoxError, Router};
-use axum_server::tls_rustls::RustlsConfig;
-use axum_server::Handle;
-use base64::{engine::general_purpose, Engine as _};
-use std::env;
-use std::net::SocketAddr;
-use std::str::FromStr;
-use std::sync::Arc;
-use std::time::Duration;
-use tokio::time;
-use tower::ServiceBuilder;
-use tower_http::services::ServeDir;
-use tower_http::trace::DefaultOnResponse;
-use tower_http::{trace::TraceLayer, LatencyUnit, ServiceBuilderExt};
-use tracing::{debug, info, warn};
-use utoipa_swagger_ui::SwaggerUi;
-use uuid::Uuid;
-use x509_parser::nom::AsBytes;
 
 #[derive(Debug, Clone, Copy)]
 struct Ports {
@@ -197,19 +200,30 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
     if *DEV_MODE {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.http));
         info!("Server listening on {}", addr);
-        axum_server::bind(addr)
-            .handle(shutdown_handle)
-            .serve(routes_sealed.into_make_service())
+
+        let listener = TcpListener::bind(addr)
+            .await
+            .expect("Cannot bind to HTTP port");
+        // TODO update to shutdown handle again
+        axum::serve(listener, routes_sealed)
+            // axum_server::bind(addr)
+            //     .handle(shutdown_handle)
+            //     .serve(routes_sealed.into_make_service())
             .await
             .expect("Starting the axum sealed server");
     } else {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.https));
         info!("Server listening on {}", addr);
-        axum_server::bind_rustls(addr, tls_config_unseal)
-            .handle(shutdown_handle)
-            .serve(routes_sealed.into_make_service())
-            .await
-            .expect("Starting the axum sealed server");
+
+        todo!("TLS listener binding with axum 0.7");
+        // let listener = TcpListener::bind(addr)
+        //     .await
+        //     .expect("Cannot bind to HTTPS port");
+        // axum_server::bind_rustls(addr, tls_config_unseal)
+        //     .handle(shutdown_handle)
+        //     .serve(routes_sealed.into_make_service())
+        //     .await
+        //     .expect("Starting the axum sealed server");
     }
 
     let enc_keys = rx_enc_keys.recv_async().await?;
@@ -324,17 +338,21 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
     if *DEV_MODE {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.http));
         info!("Server listening on {}", addr);
-        axum_server::bind(addr)
-            .serve(routes.into_make_service())
+
+        let listener = TcpListener::bind(addr).await.expect("Cannot bind to port");
+        axum::serve(listener, routes)
             .await
             .expect("Starting the axum server");
     } else {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.https));
         info!("Server listening on {}", addr);
-        axum_server::bind_rustls(addr, tls_config)
-            .serve(routes.into_make_service())
-            .await
-            .expect("Starting the axum server");
+
+        todo!("TLS listener binding with axum 0.7");
+        // let listener = TcpListener::bind(addr).await.expect("Cannot bind to port");
+        // axum_server::bind_rustls(addr, tls_config)
+        //     .serve(routes.into_make_service())
+        //     .await
+        //     .expect("Starting the axum server");
     }
 
     Ok(())
@@ -369,8 +387,8 @@ async fn redirect_http_to_https(ports: Ports) {
     let addr = SocketAddr::from(([0, 0, 0, 0], ports.http));
     debug!("Https redirect listening on {}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(redirect.into_make_service())
+    let listener = TcpListener::bind(addr).await.expect("Cannot bind to port");
+    axum::serve(listener, redirect.into_make_service())
         .await
         .expect("Binding HTTP redirect service to configure HTTP_PORT");
 }

@@ -82,7 +82,7 @@ pub async fn validate_redirect_principal(
         };
 
         let value = cookie_state.to_cookie_value(enc_key);
-        let mut builder = Cookie::build(STATE_COOKIE, value)
+        let mut builder = Cookie::build((STATE_COOKIE, value))
             .path("/")
             .secure(true)
             .http_only(true)
@@ -94,7 +94,7 @@ pub async fn validate_redirect_principal(
         } else {
             builder.secure(true)
         };
-        let cookie = builder.finish().to_string();
+        let cookie = builder.build().to_string();
 
         let code = if redirect { 302 } else { 200 };
         Response::builder()
@@ -171,7 +171,7 @@ pub async fn oidc_callback(
                 validate_id_claims(&id_claims, &cookie_state.nonce).await?;
 
                 // reset STATE_COOKIE
-                let mut builder = Cookie::build(STATE_COOKIE, "")
+                let mut builder = Cookie::build((STATE_COOKIE, ""))
                     .path("/")
                     .http_only(true)
                     .same_site(SameSite::Lax)
@@ -182,7 +182,7 @@ pub async fn oidc_callback(
                 } else {
                     builder.secure(true)
                 };
-                let cookie = builder.finish();
+                let cookie = builder.build();
                 let jar = CookieJar::new().add(cookie);
 
                 Ok((jar, ts, id_claims))

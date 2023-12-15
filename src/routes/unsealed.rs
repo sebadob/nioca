@@ -8,11 +8,12 @@ use crate::models::db::session::SessionEntity;
 use crate::routes::AppStateExtract;
 use crate::service::password_hasher::{ComparePasswords, HashPassword};
 use crate::util::{build_session_cookie, delete_session_cookie_xsrf, get_session_cookie};
-use axum::headers::authorization::Bearer;
-use axum::headers::Authorization;
-use axum::{Json, TypedHeader};
+use axum::Json;
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use axum_extra::extract::CookieJar;
+use axum_extra::headers::authorization::Bearer;
+use axum_extra::headers::Authorization;
+use axum_extra::TypedHeader;
 use time::OffsetDateTime;
 use validator::Validate;
 
@@ -115,14 +116,14 @@ pub async fn post_logout(
         SessionEntity::invalidate(sid).await?;
     }
 
-    let cookie = Cookie::build(SESSION_COOKIE, sid.to_string())
+    let cookie = Cookie::build((SESSION_COOKIE, sid.to_string()))
         .domain(&*PUB_URL)
         .path("/api")
         .secure(true)
         .http_only(true)
         .same_site(SameSite::Lax)
         .expires(OffsetDateTime::now_utc())
-        .finish();
+        .build();
     let jar = CookieJar::new().add(cookie);
 
     Ok(jar)

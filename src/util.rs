@@ -25,53 +25,53 @@ pub fn b64_encode(value: &[u8]) -> String {
 pub fn build_session_cookie<'a>(sid: String) -> Cookie<'a> {
     if *DEV_MODE {
         warn!("Building an INSECURE cookie - DO NOT USE IN PRODUCTION");
-        Cookie::build(SESSION_COOKIE, sid)
+        Cookie::build((SESSION_COOKIE, sid))
             .path("/api")
             .secure(false)
             .http_only(true)
             .same_site(SameSite::Lax)
             .max_age(MAX_SESSION_TIME)
-            .finish()
+            .build()
     } else {
-        Cookie::build(SESSION_COOKIE, sid)
+        Cookie::build((SESSION_COOKIE, sid))
             .path("/api")
             .secure(true)
             .http_only(true)
             .same_site(SameSite::Lax)
             .max_age(MAX_SESSION_TIME)
-            .finish()
+            .build()
     }
 }
 
 pub fn build_session_cookie_xsrf<'a>(xsrf: String) -> Cookie<'a> {
     if *DEV_MODE {
         warn!("Building an INSECURE cookie - DO NOT USE IN PRODUCTION");
-        Cookie::build(SESSION_COOKIE_XSRF, xsrf)
+        Cookie::build((SESSION_COOKIE_XSRF, xsrf))
             .path("/")
             .secure(false)
             .http_only(true)
             .same_site(SameSite::Lax)
             .max_age(SESSION_COOKIE_XSRF_LIFESPAN)
-            .finish()
+            .build()
     } else {
-        Cookie::build(SESSION_COOKIE_XSRF, xsrf)
+        Cookie::build((SESSION_COOKIE_XSRF, xsrf))
             .path("/")
             .secure(true)
             .http_only(true)
             .same_site(SameSite::Lax)
             .max_age(SESSION_COOKIE_XSRF_LIFESPAN)
-            .finish()
+            .build()
     }
 }
 
 pub fn delete_session_cookie_xsrf<'a>() -> Cookie<'a> {
-    Cookie::build(SESSION_COOKIE_XSRF, "")
+    Cookie::build((SESSION_COOKIE_XSRF, ""))
         .path("/")
         .secure(true)
         .http_only(true)
         .same_site(SameSite::Lax)
         .max_age(time::Duration::seconds(1))
-        .finish()
+        .build()
 }
 
 pub fn csv_to_vec(value: &str) -> Vec<String> {

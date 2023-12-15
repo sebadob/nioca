@@ -7,7 +7,8 @@ use crate::models::api::response::{
 use crate::models::db::client_ssh::ClientSshEntity;
 use crate::routes::AppStateExtract;
 use axum::extract::Path;
-use axum::{headers, Json, TypedHeader};
+use axum::Json;
+use axum_extra::{headers, TypedHeader};
 use headers::authorization::Bearer;
 use headers::Authorization;
 use std::str::FromStr;
