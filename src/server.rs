@@ -201,29 +201,20 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.http));
         info!("Server listening on {}", addr);
 
-        let listener = TcpListener::bind(addr)
-            .await
-            .expect("Cannot bind to HTTP port");
-        // TODO update to shutdown handle again
-        axum::serve(listener, routes_sealed)
-            // axum_server::bind(addr)
-            //     .handle(shutdown_handle)
-            //     .serve(routes_sealed.into_make_service())
+        axum_server::bind(addr)
+            .handle(shutdown_handle)
+            .serve(routes_sealed.into_make_service())
             .await
             .expect("Starting the axum sealed server");
     } else {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.https));
         info!("Server listening on {}", addr);
 
-        todo!("TLS listener binding with axum 0.7");
-        // let listener = TcpListener::bind(addr)
-        //     .await
-        //     .expect("Cannot bind to HTTPS port");
-        // axum_server::bind_rustls(addr, tls_config_unseal)
-        //     .handle(shutdown_handle)
-        //     .serve(routes_sealed.into_make_service())
-        //     .await
-        //     .expect("Starting the axum sealed server");
+        axum_server::bind_rustls(addr, tls_config_unseal)
+            .handle(shutdown_handle)
+            .serve(routes_sealed.into_make_service())
+            .await
+            .expect("Starting the axum sealed server");
     }
 
     let enc_keys = rx_enc_keys.recv_async().await?;
@@ -339,20 +330,18 @@ pub async fn run_server(level: &str) -> Result<(), anyhow::Error> {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.http));
         info!("Server listening on {}", addr);
 
-        let listener = TcpListener::bind(addr).await.expect("Cannot bind to port");
-        axum::serve(listener, routes)
+        axum_server::bind(addr)
+            .serve(routes.into_make_service())
             .await
             .expect("Starting the axum server");
     } else {
         let addr = SocketAddr::from(([0, 0, 0, 0], ports.https));
         info!("Server listening on {}", addr);
 
-        todo!("TLS listener binding with axum 0.7");
-        // let listener = TcpListener::bind(addr).await.expect("Cannot bind to port");
-        // axum_server::bind_rustls(addr, tls_config)
-        //     .serve(routes.into_make_service())
-        //     .await
-        //     .expect("Starting the axum server");
+        axum_server::bind_rustls(addr, tls_config)
+            .serve(routes.into_make_service())
+            .await
+            .expect("Starting the axum server");
     }
 
     Ok(())

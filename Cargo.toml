@@ -18,7 +18,8 @@ argon2 = { version = "0.5", features = ["std", "zeroize"] }
 async-trait = "0.1"
 axum = { version = "0.7", features = ["http2"] }
 axum-extra = { version = "0.9", features = ["cookie", "typed-header"] }
-axum-server = { version = "0.5.1", features = ["tls-rustls"] }
+axum-server = { git = "https://github.com/programatik29/axum-server", features = ["tls-rustls"] }
+#axum-server = { version = "0.5.1", features = ["tls-rustls"] }
 base64 = "0.21"
 bincode = "1.3"
 cached = { version = "0.46", features = ["async_tokio_rt_multi_thread"] }
