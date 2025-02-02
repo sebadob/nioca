@@ -209,7 +209,7 @@ pub async fn init_values_check(
         ));
     }
 
-    service::x509::x509_ca_validate(&req.root_pem, &req.it_pem, &req.it_key, &req.it_pem).await
+    service::x509::x509_ca_validate(&req.root_pem, &req.it_pem, &req.it_key, &req.it_password).await
 }
 
 /// Checks a given master shard key against the check hashes from the database and saves the shard
