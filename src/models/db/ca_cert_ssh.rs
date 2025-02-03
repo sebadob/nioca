@@ -158,16 +158,25 @@ pub struct SshKeyPairOpenssh {
 
 impl SshKeyPairOpenssh {
     pub fn new(alg: SshKeyAlg) -> Result<Self, ErrorResponse> {
-        let key = PrivateKey::random(&mut OsRng, alg.as_alg()).unwrap();
-        let id_pub = key.public_key().to_openssh().unwrap();
-        let id = key.to_openssh(LineEnding::LF).unwrap().to_string();
+        let key_result = PrivateKey::random(&mut OsRng, alg.as_alg());
 
-        Ok(Self {
-            id,
-            id_pub,
-            alg,
-            typ: None,
-        })
+        let res = match key_result {
+            Ok(key) => {
+                let id_pub = key.public_key().to_openssh().unwrap();
+                let id = key.to_openssh(LineEnding::LF).unwrap().to_string();
+        
+                return Ok(Self {
+                    id,
+                    id_pub,
+                    alg,
+                    typ: None,
+                })
+            },
+            Err(e) => {
+                let err = ErrorResponse::new(crate::models::api::error_response::ErrorResponseType::BadRequest, e.to_string());       
+                return Err(err);
+            }
+          };
     }
 
     pub async fn from_key_enc(key_enc_hex: &str, password: &str) -> Result<Self, ErrorResponse> {
