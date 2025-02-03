@@ -54,7 +54,7 @@ rsa = { version = "0.9.2", features = ["serde", "getrandom"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sqlx = { version = "0.7", features = ["macros", "migrate", "postgres", "runtime-tokio", "tls-rustls", "time", "uuid"] }
-ssh-key = { version = "0.6", features = ["ed25519", "p256", "p384", "serde"] }
+ssh-key = { version = "0.6", features = ["ed25519", "p256", "p384", "rsa", "serde"] }
 time = { version = "0.3", features = ["serde"] }
 tokio = { version = "1.26", features = ["full"] }
 tokio-util = { version = "0.7", features = ["full"] }
