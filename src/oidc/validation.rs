@@ -185,6 +185,8 @@ pub enum Flows {
     client_credentials,
     password,
     refresh_token,
+    #[serde(other)]
+    Unknown,
 }
 
 /// Used internally to cache token validation requests for a short amount of time
