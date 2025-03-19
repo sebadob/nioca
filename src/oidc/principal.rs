@@ -41,7 +41,7 @@ impl PrincipalOidc {
         };
 
         Ok(Self {
-            id: claims.uid,
+            id: claims.email,
             preferred_username: claims.preferred_username,
             subject: claims.sub,
             roles,
@@ -184,7 +184,7 @@ pub struct JwtAccessClaims {
     pub scope: String,
     pub allowed_origins: Option<Vec<String>>,
     // user part
-    pub uid: String,
+    pub email: String,
     pub preferred_username: Option<String>,
     pub roles: Option<Vec<String>>,
     pub groups: Option<Vec<String>>,
@@ -211,7 +211,7 @@ pub struct JwtIdClaims {
 pub struct JwtRefreshClaims {
     pub azp: String,
     pub typ: JwtType,
-    pub uid: String,
+    pub email: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
